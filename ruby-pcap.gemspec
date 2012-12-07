@@ -9,10 +9,12 @@ Gem::Specification.new do |gem|
   gem.email         = ["mbarczak@gmail.com"]
   gem.description   = %q{Ruby interface to LBL Packet Capture library. This library also includes classes to access packet header fields.}
   gem.summary       = %q{Ruby interface to LBL Packet Capture library. This library also includes classes to access packet header fields.}
-  gem.homepage      = "https://github.com/ickymettle/ruby-libpcap"
+  gem.homepage      = "https://github.com/ickymettle/ruby-pcap"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+
+  gem.extensions << "ext/extconf.rb"
 end
