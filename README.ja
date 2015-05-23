@@ -1,50 +1,50 @@
-* $B35MW(B
+* 概要
 
-ruby-pcap $B$O(B Ruby $B$+$i(B LBL $B$N(B libpcap (Packet Capture library) $B$X%"%/(B
-$B%;%9$9$k$?$a$N3HD%%i%$%V%i%j$G$9!#(BTCP/IP$B$N%X%C%@$N>pJs$K%"%/%;%9$9$k$?(B
-$B$a$N%/%i%9$b4^$s$G$$$^$9!#(B
+ruby-pcap は Ruby から LBL の libpcap (Packet Capture library) へアク
+セスするための拡張ライブラリです。TCP/IPのヘッダの情報にアクセスするた
+めのクラスも含んでいます。
 
-* $B%$%s%9%H!<%k(B
+* インストール
 
-$BI,MW$J$b$N(B:
+必要なもの:
 
   - ruby-1.4.x
   - libpcap (http://www.tcpdump.org/)
 
-$B%3%s%Q%$%k(B:
+コンパイル:
 
-ruby $B$,3HD%%i%$%V%i%j$N%@%$%J%_%C%/%j%s%/$r%5%]!<%H$7$F$$$k>l9g$O!"(B
-$B0J2<$N<j=g$G%$%s%9%H!<%k$G$-$^$9!#(B
+ruby が拡張ライブラリのダイナミックリンクをサポートしている場合は、
+以下の手順でインストールできます。
 
   ruby extconf.rb [options]
   make
   make install
 
-'ruby extconf.rb'$B$r<B9T$9$k;~$K$O0J2<$N%*%W%7%g%s$r;XDj$G$-$^$9!#(B
+'ruby extconf.rb'を実行する時には以下のオプションを指定できます。
 
 `--with-pcap-dir=PREFIX'
-    libpcap$B$,%$%s%9%H!<%k$5$l$F$$$k%G%#%l%/%H%j$r;XDj$7$^$9!#(B
-    $B%G%U%)%k%H$O(B'/usr/local'$B$G$9!#(B
+    libpcapがインストールされているディレクトリを指定します。
+    デフォルトは'/usr/local'です。
 
-$B%@%$%J%_%C%/%j%s%/$,;H$($J$$>l9g$O(B ruby $B$K@EE*$K%j%s%/$7$F2<$5$$!#(B
-$B$=$N>l9g$O(B ruby $B%=!<%9Cf$N(B 'ext' $B%G%#%l%/%H%j$N2<$G(B ruby-pcap $B$rE83+$7(B
-$B$F$+$i(B ruby $B$r%S%k%I$7$F2<$5$$!#(B
+ダイナミックリンクが使えない場合は ruby に静的にリンクして下さい。
+その場合は ruby ソース中の 'ext' ディレクトリの下で ruby-pcap を展開し
+てから ruby をビルドして下さい。
 
-* $B;H$$J}(B
+* 使い方
 
-doc $B$*$h$S(B doc-ja $B%G%#%l%/%H%j0J2<$K$"$k%U%!%$%k$r8+$F2<$5$$!#(B
-examples $B%G%#%l%/%H%j$K4JC1$J%5%s%W%k%9%/%j%W%H$,$"$j$^$9!#(B
+doc および doc-ja ディレクトリ以下にあるファイルを見て下さい。
+examples ディレクトリに簡単なサンプルスクリプトがあります。
 
-* $B:n<T(B
+* 作者
 
-$BJ!Eh@55!(B <fukusima@goto.info.waseda.ac.jp>
+福嶋正機 <fukusima@goto.info.waseda.ac.jp>
 
-ruby-pcap$B$OJ!Eh@55!$,Cx:n8"$rJ];}$9$k(B free software $B$G$9!#(B
+ruby-pcapは福嶋正機が著作権を保持する free software です。
 
-ruby-pcap$B$O(BGPL(GNU GENERAL PUBLIC LICENSE)$B$K=>$C$F:FG[I[$^$?$O(B
-$BJQ99$9$k$3$H$,$G$-$^$9!#(BGPL$B$K$D$$$F$O(BCOPYING$B%U%!%$%k$r;2>H$7$F(B
-$B$/$@$5$$!#(B
+ruby-pcapはGPL(GNU GENERAL PUBLIC LICENSE)に従って再配布または
+変更することができます。GPLについてはCOPYINGファイルを参照して
+ください。
 
-ruby-pcap$B$OL5J]>Z$G$9!#:n<T$O(Bruby-pcap$B$N%P%0$J$I$+$iH/@8$9$k(B
-$B$$$+$J$kB;32$KBP$7$F$b@UG$$r;}$A$^$;$s!#>\:Y$K$D$$$F$O(B GPL $B$r(B
-$B;2>H$7$F$/$@$5$$!#(B
+ruby-pcapは無保証です。作者はruby-pcapのバグなどから発生する
+いかなる損害に対しても責任を持ちません。詳細については GPL を
+参照してください。

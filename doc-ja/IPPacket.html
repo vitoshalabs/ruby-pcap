@@ -8,25 +8,25 @@
 <DT><H1>IPPacket</H1></DT>
 <DD>
 
-      IP�إå���ޤ�ѥ��åȡ�
+      IPヘッダを含むパケット。
     </DD>
-<DT><H2>�����ѡ����饹:</H2></DT>
+<DT><H2>スーパークラス:</H2></DT>
 <DD><DL><DT><A HREF="Packet.html"><CODE>Packet</CODE></A></DT></DL></DD>
-<DT><H2>�᥽�å�:</H2></DT>
+<DT><H2>メソッド:</H2></DT>
 <DL COMPACT>
 <DT>
 <A NAME="ip_data"><CODE>ip_data</CODE></A>
 <DD>
 <p>
 
-          �ǡ�����ʬ��<A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A>�Ȥ����֤��ޤ���
+          データ部分を<A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A>として返します。
         </p>
 <DT>
 <A NAME="ip_df?"><CODE>ip_df?</CODE></A>
 <DD>
 <p>
 
-          Don't Fragment �ӥåȤ�Ω�äƤ��뤫�ɤ������֤��ޤ���
+          Don't Fragment ビットが立っているかどうかを返します。
         </p>
 <DT>
 <A NAME="ip_dst"><CODE>ip_dst</CODE></A>
@@ -36,56 +36,56 @@
 <DD>
 <p>
 
-          �ǥ��ƥ��͡������ IP ���ɥ쥹��<A HREF="IPAddress.html"><CODE>IPAddress</CODE></A> �Ȥ����֤��ޤ���
+          デスティネーション IP アドレスを<A HREF="IPAddress.html"><CODE>IPAddress</CODE></A> として返します。
         </p>
 <DT>
 <A NAME="ip_flags"><CODE>ip_flags</CODE></A>
 <DD>
 <p>
 
-          IP �ե饰�ӥåȥե������ (3 bit) ���ͤ��֤��ޤ���
+          IP フラグビットフィールド (3 bit) の値を返します。
         </p>
 <DT>
 <A NAME="ip_hlen"><CODE>ip_hlen</CODE></A>
 <DD>
 <p>
 
-          �إå�Ĺ���֤��ޤ���(ñ��: 4 octets)
+          ヘッダ長を返します。(単位: 4 octets)
         </p>
 <DT>
 <A NAME="ip_id"><CODE>ip_id</CODE></A>
 <DD>
 <p>
 
-          Identification �ե�����ɤ��ͤ��֤��ޤ���
+          Identification フィールドの値を返します。
         </p>
 <DT>
 <A NAME="ip_len"><CODE>ip_len</CODE></A>
 <DD>
 <p>
 
-          �ѥ��å�Ĺ���֤��ޤ���(ñ��: octet)
+          パケット長を返します。(単位: octet)
         </p>
 <DT>
 <A NAME="ip_mf?"><CODE>ip_mf?</CODE></A>
 <DD>
 <p>
 
-          More Fragment �ӥåȤ�Ω�äƤ��뤫�ɤ������֤��ޤ���
+          More Fragment ビットが立っているかどうかを返します。
         </p>
 <DT>
 <A NAME="ip_off"><CODE>ip_off</CODE></A>
 <DD>
 <p>
 
-          �ե饰���ȥ��ե��åȤ��֤��ޤ���
+          フラグメントオフセットを返します。
         </p>
 <DT>
 <A NAME="ip_proto"><CODE>ip_proto</CODE></A>
 <DD>
 <p>
 
-          �ץ��ȥ���ե�����ɤ��ͤ��֤��ޤ���
+          プロトコルフィールドの値を返します。
         </p>
 <DT>
 <A NAME="ip_src"><CODE>ip_src</CODE></A>
@@ -95,42 +95,42 @@
 <DD>
 <p>
 
-          ������ IP ���ɥ쥹��<A HREF="IPAddress.html"><CODE>IPAddress</CODE></A> �Ȥ����֤��ޤ���
+          ソース IP アドレスを<A HREF="IPAddress.html"><CODE>IPAddress</CODE></A> として返します。
         </p>
 <DT>
 <A NAME="ip_sum"><CODE>ip_sum</CODE></A>
 <DD>
 <p>
 
-          �����å�����ե�����ɤ��ͤ��֤��ޤ���
+          チェックサムフィールドの値を返します。
         </p>
 <DT>
 <A NAME="ip_tos"><CODE>ip_tos</CODE></A>
 <DD>
 <p>
 
-          TOS�ե�����ɤ��ͤ��֤��ޤ���
+          TOSフィールドの値を返します。
         </p>
 <DT>
 <A NAME="ip_ttl"><CODE>ip_ttl</CODE></A>
 <DD>
 <p>
 
-          TTL �ե�����ɤ��ͤ��֤��ޤ���
+          TTL フィールドの値を返します。
         </p>
 <DT>
 <A NAME="ip_ver"><CODE>ip_ver</CODE></A>
 <DD>
 <p>
 
-          IP �С������ե�����ɤ��ͤ��֤��ޤ���
+          IP バージョンフィールドの値を返します。
         </p>
 <DT>
 <A NAME="to_s"><CODE>to_s</CODE></A>
 <DD>
 <p>
 
-          ʸ������Ѵ����ޤ���
+          文字列に変換します。
         </p>
 </DL>
 </DL>

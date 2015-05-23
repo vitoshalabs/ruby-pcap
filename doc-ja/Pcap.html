@@ -8,9 +8,9 @@
 <DT><H1>Pcap</H1></DT>
 <DD>
 
-      pcap ���̤˴ؤ���᥽�åɤ������������Ƥ��ޤ���
+      pcap 全般に関するメソッドや定数を定義しています。
     </DD>
-<DT><H2>���:</H2></DT>
+<DT><H2>定数:</H2></DT>
 <DL COMPACT>
 <DT>
 <A NAME="::DLT_NULL"><CODE>DLT_NULL</CODE></A>
@@ -59,47 +59,47 @@
 <DD>
 <p>
 
-          �ǡ�������ؤμ����ɽ�������
+          データリンク層の種類を表す定数。
         </p>
 </DL>
-<DT><H2>�⥸�塼��᥽�å�:</H2></DT>
+<DT><H2>モジュールメソッド:</H2></DT>
 <DL COMPACT>
 <DT>
 <A NAME=".convert="><CODE>convert = <var>bool</var></CODE></A>
 <DD>
 <p>
 
-          <CODE>Pcap</CODE> �⥸�塼����Υ��饹�� IP ���ɥ쥹�ʤɤο��ͤ�
-          ʸ������Ѵ����褦�Ȥ�������ư������ꤷ�ޤ���<CODE>true</CODE>
-          �ʤ�Ф��Τ褦�ʿ��ͤ�̾�����Ѵ�����ޤ���
+          <CODE>Pcap</CODE> モジュール中のクラスが IP アドレスなどの数値を
+          文字列に変換しようとした時の動作を設定します。<CODE>true</CODE>
+          ならばそのような数値は名前に変換されます。
         </p>
 <DT>
 <A NAME=".convert?"><CODE>convert?</CODE></A>
 <DD>
 <p>
 
-          <CODE>Pcap</CODE> �⥸�塼����Υ��饹�� IP ���ɥ쥹�ʤɤο��ͤ�
-          ʸ������Ѵ����褦�Ȥ�������ư����֤��ޤ���<CODE>true</CODE>
-          �ʤ�Ф��Τ褦�ʿ��ͤ�̾�����Ѵ�����ޤ���
+          <CODE>Pcap</CODE> モジュール中のクラスが IP アドレスなどの数値を
+          文字列に変換しようとした時の動作を返します。<CODE>true</CODE>
+          ならばそのような数値は名前に変換されます。
         </p>
 <DT>
 <A NAME=".lookupdev"><CODE>lookupdev</CODE></A>
 <DD>
 <p>
 
-          �ͥåȥ���ǥХ���̾���֤��ޤ���
+          ネットワークデバイス名を返します。
         </p>
 <DT>
 <A NAME=".lookupnet"><CODE>lookupnet(<var>device</var>)</CODE></A>
 <DD>
 <p>
 
-          <CODE>[net, mask]</CODE> �ʤ�2����������֤��ޤ���
-          <CODE>net</CODE>�ϥͥåȥ���ֹ��ɽ��
-          <A HREF="IPAddress.html"><CODE>IPAddress</CODE></A>�Ǥ���
-          <CODE>mask</CODE>�ϥͥåȥޥ�����ɽ��<A HREF="http://www.ruby-lang.org/ja/man-1.4/Integer.html"><CODE>Integer</CODE></A>�Ǥ���
-          ����<VAR>device</VAR>�ˤ��ͥåȥ���ǥХ���̾�����
-          ���ޤ���
+          <CODE>[net, mask]</CODE> なる2要素配列を返します。
+          <CODE>net</CODE>はネットワーク番号を表す
+          <A HREF="IPAddress.html"><CODE>IPAddress</CODE></A>です。
+          <CODE>mask</CODE>はネットマスクを表す<A HREF="http://www.ruby-lang.org/ja/man-1.4/Integer.html"><CODE>Integer</CODE></A>です。
+          引数<VAR>device</VAR>によりネットワークデバイス名を指定
+          します。
         </p>
 </DL>
 </DL>
