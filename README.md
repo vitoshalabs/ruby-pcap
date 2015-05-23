@@ -1,30 +1,34 @@
-* Introduction
+## ruby-pcap
 
 ruby-pcap is a ruby extension to LBL libpcap (Packet Capture library).
 This library also includes classes to access TCP/IP header.
 
-* Installation
+## Installation
 
-  gem install ruby-pcap
+```
+gem install ruby-pcap
+```
 
-Requirements:
+### Requirements
 
-  - ruby-1.9.3 or higher (May work with older ruby version but not being tested)
-  - libpcap (http://www.tcpdump.org/)
+* ruby-1.9.3 or higher
+  * May work with older ruby version but not being tested
+* libpcap (http://www.tcpdump.org/)
 
-* Usage
+## Usage
 
 See the documentation under the directory 'doc'.
 Directory 'examples' contains some simple scripts.
 
-* Author
+## Author
 
 Masaki Fukushima <fukusima@goto.info.waseda.ac.jp>
 
-* Maintained by
+## Maintained by
 
 Marcus Barczak <mbarczak@etsy.com>
 
+## Copyright
 
 ruby-pcap is copyrighted free software by Masaki Fukushima.
 
