@@ -1,17 +1,6 @@
 require 'pcap'
 require 'optparse'
 
-def pcaplet_usage()
-  $stderr.print <<END
-Usage: #{File.basename $0} [ -dnv ] [ -i interface | -r file ]
-       #{' ' * File.basename($0).length} [ -c count ] [ -s snaplen ] [ filter ]
-Options:
-  -n  do not convert address to name
-  -d  debug mode
-  -v  verbose mode
-END
-end
-
 module Pcap
   class Pcaplet
     def usage(status, msg = nil)
@@ -120,6 +109,20 @@ module Pcap
 
     def close
       @capture.close
+    end
+
+
+    private
+
+    def pcaplet_usage()
+      $stderr.print <<END
+Usage: #{File.basename $0} [ -dnv ] [ -i interface | -r file ]
+       #{' ' * File.basename($0).length} [ -c count ] [ -s snaplen ] [ filter ]
+Options:
+  -n  do not convert address to name
+  -d  debug mode
+  -v  verbose mode
+END
     end
   end
 end
