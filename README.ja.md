@@ -1,5 +1,7 @@
 ## ruby-pcap
 
+[![Build Status](https://travis-ci.org/codeout/ruby-pcap.svg?branch=ruby-pcap-gem)](https://travis-ci.org/codeout/ruby-pcap)
+
 ruby-pcap は Ruby から LBL の libpcap (Packet Capture library) へアク
 セスするための拡張ライブラリです。TCP/IPのヘッダの情報にアクセスするた
 めのクラスも含んでいます。
