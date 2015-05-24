@@ -18,4 +18,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.extensions << "ext/pcap/extconf.rb"
+
+  gem.add_development_dependency "rake-compiler"
 end
