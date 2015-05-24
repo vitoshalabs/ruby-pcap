@@ -17,5 +17,5 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.extensions << "ext/extconf.rb"
+  gem.extensions << "ext/pcap/extconf.rb"
 end
