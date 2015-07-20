@@ -1,6 +1,6 @@
 ## ruby-pcap
 
-[![Build Status](https://travis-ci.org/codeout/ruby-pcap.svg?branch=ruby-pcap-gem)](https://travis-ci.org/codeout/ruby-pcap)
+[![Build Status](https://travis-ci.org/ickymettle/ruby-pcap.svg)](https://travis-ci.org/ickymettle/ruby-pcap)
 
 ruby-pcap is a ruby extension to LBL libpcap (Packet Capture library).
 This library also includes classes to access TCP/IP header.
