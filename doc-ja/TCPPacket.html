@@ -8,32 +8,32 @@
 <DT><H1>TCPPacket</H1></DT>
 <DD>
 
-      TCP�إå���ޤ�ѥ��åȡ�
+      TCPヘッダを含むパケット。
     </DD>
-<DT><H2>�����ѡ����饹:</H2></DT>
+<DT><H2>スーパークラス:</H2></DT>
 <DD><DL><DT><A HREF="IPPacket.html"><CODE>IPPacket</CODE></A></DT></DL></DD>
-<DT><H2>�᥽�å�:</H2></DT>
+<DT><H2>メソッド:</H2></DT>
 <DL COMPACT>
 <DT>
 <A NAME="tcp_ack"><CODE>tcp_ack</CODE></A>
 <DD>
 <p>
 
-          Acknowledgement Number ���֤��ޤ���
+          Acknowledgement Number を返します。
         </p>
 <DT>
 <A NAME="tcp_data"><CODE>tcp_data</CODE></A>
 <DD>
 <p>
 
-          �ǡ�����ʬ�� <A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A> �Ȥ����֤��ޤ���
+          データ部分を <A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A> として返します。
         </p>
 <DT>
 <A NAME="tcp_data_len"><CODE>tcp_data_len</CODE></A>
 <DD>
 <p>
 
-          �ǡ�����ʬ��Ĺ�����֤��ޤ���
+          データ部分の長さを返します。
         </p>
 <DT>
 <A NAME="tcp_dport"><CODE>tcp_dport</CODE></A>
@@ -43,22 +43,22 @@
 <DD>
 <p>
 
-          �ǥ��ƥ��͡������ݡ����ֹ���֤��ޤ���
+          デスティネーションポート番号を返します．
         </p>
 <DT>
 <A NAME="tcp_flags"><CODE>tcp_flags</CODE></A>
 <DD>
 <p>
 
-          TCP �ե饰�ե�����ɤ��� (6 bit) ���֤��ޤ���
+          TCP フラグフィールドの値 (6 bit) を返します。
         </p>
 <DT>
 <A NAME="tcp_flags_s"><CODE>tcp_flags_s</CODE></A>
 <DD>
 <p>
 
-          TCP �ե饰�ե�����ɤ��� (6 bit) ��
-          <CODE>&quot;.A...F&quot;</CODE> �Ȥ��ä�������ʸ����Ȥ����֤��ޤ���
+          TCP フラグフィールドの値 (6 bit) を
+          <CODE>&quot;.A...F&quot;</CODE> といった形式の文字列として返します。
         </p>
 <DT>
 <A NAME="tcp_fin?"><CODE>tcp_fin?</CODE></A>
@@ -80,8 +80,8 @@
 <DD>
 <p>
 
-          �ե饰��Ω�äƤ����<CODE>true</CODE>�򡤤����Ǥʤ����
-          <CODE>false</CODE>���֤��ޤ���
+          フラグが立っていれば<CODE>true</CODE>を，そうでなければ
+          <CODE>false</CODE>を返します．
         </p>
 <DT>
 <A NAME="tcp_off"><CODE>tcp_off</CODE></A>
@@ -91,21 +91,21 @@
 <DD>
 <p>
 
-          TCP �ǡ������ե��å�(TCP�إå�Ĺ)���֤��ޤ���
+          TCP データオフセット(TCPヘッダ長)を返します。
         </p>
 <DT>
 <A NAME="tcp_seq"><CODE>tcp_seq</CODE></A>
 <DD>
 <p>
 
-          Sequence Number ���֤��ޤ���
+          Sequence Number を返します。
         </p>
 <DT>
 <A NAME="tcp_sum"><CODE>tcp_sum</CODE></A>
 <DD>
 <p>
 
-          Checksum �ե�����ɤ��ͤ��֤��ޤ���
+          Checksum フィールドの値を返します。
         </p>
 <DT>
 <A NAME="tcp_sport"><CODE>tcp_sport</CODE></A>
@@ -115,28 +115,28 @@
 <DD>
 <p>
 
-          �������ݡ����ֹ���֤��ޤ���
+          ソースポート番号を返します．
         </p>
 <DT>
 <A NAME="tcp_urp"><CODE>tcp_urp</CODE></A>
 <DD>
 <p>
 
-          Urgent Pointer �ե�����ɤ��ͤ��֤��ޤ���
+          Urgent Pointer フィールドの値を返します。
         </p>
 <DT>
 <A NAME="tcp_win"><CODE>tcp_win</CODE></A>
 <DD>
 <p>
 
-          Window Size ���֤��ޤ���
+          Window Size を返します。
         </p>
 <DT>
 <A NAME="to_s"><CODE>to_s</CODE></A>
 <DD>
 <p>
 
-          ʸ������Ѵ����ޤ���
+          文字列に変換します。
         </p>
 </DL>
 </DL>

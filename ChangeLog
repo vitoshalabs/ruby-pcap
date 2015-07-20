@@ -1,3 +1,109 @@
+2015-05-24  Shintaro Kojima <goodies@codeout.net>
+
+	* version 0.7.8 released.
+
+	* Ruby 2.2 support
+
+2012-12-06  Marcus Barczak <mbarczak@etsy.com>
+
+	* version 0.7.7 released.
+
+	* Migrate packaging from jeweller to bundler
+
+2012-01-20  Pedro Navajas <pnavajas@nosolosoftware.biz>
+
+	* Modified pcap.c: new method returning the file descriptor
+
+2011-06-11  Tim Jarratt <tjarratt@gmail.com>
+
+	* Improve performance during capture and makes the gem work on any OS with ruby 1.9.*
+
+2011-06-10  Ilya Maykov <ilyam@ooyala.com>
+
+	* Don't do TRAP_BEG / TRAP_END on any version of Ruby 1.9.
+
+2011-06-09  Ilya Maykov <ilyam@ooyala.com>
+
+	* version 0.7.6 released.
+
+	* Make the trap / don't trap decision at gem installation time, as it's always based on RUBY_PLATFORM + RUBY_VERSION
+	which are known at that time.
+	Removed the shouldnt_trap argument from Pcap::Capture#dispatch and Pcap::Capture#loop, no longer needed.
+	Cache the duplicated variable in Pcap::Pcaplet#each_packet so we don't compute it each time.
+	And some minor code cleanup here and there.
+
+2011-06-07  Tim Jarratt <tjarratt@nearbuysystems.com>
+
+	* Only log "packets received / packets dropped" when a specific flag is passed in.
+
+2011-05-31  Tim Jarratt <tjarratt@nearbuysystems.com>
+
+	* version 0.7.5 released.
+
+	* Added source, destination mac address methods to TCP Packet.
+
+2011-05-30  Tim Jarratt <tjarratt@nearbuysystems.com>
+
+	* Fixes to make this gem run with ruby 1.9.2@p180 on Mac OS X 10.6.7.
+
+2011-02-17  Andrew Hobson <ahobson@damballa.com>
+
+	* version 0.7.4 released.
+
+	* Add support for recalculating the ip checksum.
+	Automatically do so if changing the source or dest IP
+
+2011-02-03  Eric Tamme <etamme@gmail.com>
+
+	* Fixed STR2CSTR issue for ruby 1.9.2
+
+2010-12-02  Andrew Hobson <ahobson@damballa.com>
+
+	* version 0.7.3 released.
+
+	* Update for newest version of libpcap
+
+2010-09-27  Andrew Hobson <ahobson@damballa.com>
+
+	* version 0.7.2 released.
+
+	* Use the proper RSTRING macros.  This appears to get ruby 1.9 working
+
+2010-06-07  Andrew Hobson <ahobson@damballa.com>
+
+	* version 0.7.1 released.
+
+	* Fix assignment of packet timestamp and bump version
+
+2009-06-06  Roman Shterenzon <roman.shterenzon@gmail.com>
+
+	* version 0.7.0 released.
+
+	* Convert to rubygem
+
+2009-05-26  Andrew Hobson <ahobson@macguffin.infloop.com>
+
+	* Allow modifying the src and dst IPs
+
+2009-05-12  Andrew Hobson <ahobson@macguffin.infloop.com>
+
+	* Allow changing the time on a packet
+
+2008-12-22  Andrew Hobson <ahobson@macguffin.local>
+
+	* Fix warning in 1.8.6.
+	Submitted-By: xHire
+
+2008-11-24  Andrew Hobson <ahobson@macguffin.infloop.com>
+
+	* Add support for opening dead pcaps
+	The plan is to support dumping created packets to files and
+	using pcap_inject
+
+	* Apply patches from debian
+
+	* Add support for dumping a raw packet
+
 2000-08-13  Masaki Fukushima  <fukusima@goto.info.waseda.ac.jp>
 
 	* version 0.6 released.

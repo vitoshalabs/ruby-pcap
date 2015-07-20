@@ -8,18 +8,18 @@
 <DT><H1>UDPPacket</H1></DT>
 <DD>
 
-      UDP�إå���ޤ�ѥ��åȡ�
+      UDPヘッダを含むパケット。
     </DD>
-<DT><H2>�����ѡ����饹:</H2></DT>
+<DT><H2>スーパークラス:</H2></DT>
 <DD><DL><DT><A HREF="IPPacket.html"><CODE>IPPacket</CODE></A></DT></DL></DD>
-<DT><H2>�᥽�å�:</H2></DT>
+<DT><H2>メソッド:</H2></DT>
 <DL COMPACT>
 <DT>
 <A NAME="udp_data"><CODE>udp_data</CODE></A>
 <DD>
 <p>
 
-          �ǡ�����ʬ�� <A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A> �Ȥ����֤��ޤ���
+          データ部分を <A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A> として返します。
         </p>
 <DT>
 <A NAME="udp_dport"><CODE>udp_dport</CODE></A>
@@ -29,22 +29,22 @@
 <DD>
 <p>
 
-          �ǥ��ƥ��͡������ݡ����ֹ���֤��ޤ���
+          デスティネーションポート番号を返します．
         </p>
 <DT>
 <A NAME="udp_len"><CODE>udp_len</CODE></A>
 <DD>
 <p>
 
-          Length�ե�����ɤ��ͤ��֤��ޤ��������ͤ�UDP�ǡ��������
-          ���Τ�Ĺ��(ñ��: �����ƥå�)��ɽ���ޤ���
+          Lengthフィールドの値を返します。この値はUDPデータグラム
+          全体の長さ(単位: オクテット)を表します。
         </p>
 <DT>
 <A NAME="udp_sum"><CODE>udp_sum</CODE></A>
 <DD>
 <p>
 
-          Checksum �ե�����ɤ��ͤ��֤��ޤ���
+          Checksum フィールドの値を返します。
         </p>
 <DT>
 <A NAME="udp_sport"><CODE>udp_sport</CODE></A>
@@ -54,14 +54,14 @@
 <DD>
 <p>
 
-          �������ݡ����ֹ���֤��ޤ���
+          ソースポート番号を返します．
         </p>
 <DT>
 <A NAME="to_s"><CODE>to_s</CODE></A>
 <DD>
 <p>
 
-          ʸ������Ѵ����ޤ���
+          文字列に変換します。
         </p>
 </DL>
 </DL>

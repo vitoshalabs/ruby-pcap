@@ -10,93 +10,93 @@
 
       <P>
 
-        ICMP��å�������ޤ�ѥ��åȡ�
+        ICMPメッセージを含むパケット。
       </P>
 
       <P>
 
-        ICMP��å������Υե����ޥåȤ�ICMP�����פˤ�äưۤʤ��
-        �������Τ��������ICMP�����פΥѥ��åȤˤ���¸�ߤ��ʤ��ե���
-        ��ɤ�����ޤ���¸�ߤ��ʤ��ե�����ɤ˥����������褦�Ȥ�
-        ����㳰��ȯ�����ޤ���
+        ICMPメッセージのフォーマットはICMPタイプによって異なりま
+        す。そのため特定のICMPタイプのパケットにしか存在しないフィー
+        ルドがあります。存在しないフィールドにアクセスしようとす
+        ると例外が発生します。
       </P>
 
       <P>
 
-        �ɤ�ICMP�����פ��Ф��Ƥ�ͭ���ʥե�����ɤ� type, code,
-        cksum �Ǥ���
+        どのICMPタイプに対しても有効なフィールドは type, code,
+        cksum です。
       </P>
 
     </DD>
-<DT><H2>�����ѡ����饹:</H2></DT>
+<DT><H2>スーパークラス:</H2></DT>
 <DD><DL><DT><A HREF="IPPacket.html"><CODE>IPPacket</CODE></A></DT></DL></DD>
-<DT><H2>�᥽�å�:</H2></DT>
+<DT><H2>メソッド:</H2></DT>
 <DL COMPACT>
 <DT>
 <A NAME="icmp_cksum"><CODE>icmp_cksum</CODE></A>
 <DD>
 <p>
 
-          ICMP�����å�������֤��ޤ���
+          ICMPチェックサムを返します。
         </p>
 <DT>
 <A NAME="icmp_code"><CODE>icmp_code</CODE></A>
 <DD>
 <p>
 
-          ICMP�����ɤ��֤��ޤ���
+          ICMPコードを返します。
         </p>
 <DT>
 <A NAME="icmp_data"><CODE>icmp_data</CODE></A>
 <DD>
 <p>
 
-          ICMP_ECHO/ICMP_ECHOREPLY��å������Υǡ�����ʬ��
-          <A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A>�Ȥ����֤��ޤ���
+          ICMP_ECHO/ICMP_ECHOREPLYメッセージのデータ部分を
+          <A HREF="http://www.ruby-lang.org/ja/man-1.4/String.html"><CODE>String</CODE></A>として返します。
         </p>
 <DT>
 <A NAME="icmp_gwaddr"><CODE>icmp_gwaddr</CODE></A>
 <DD>
 <p>
 
-          ICMP_REDIRECT��å������Υ����ȥ��������ɥ쥹��
-          <A HREF="IPAddress.html"><CODE>IPAddress</CODE></A>�Ȥ����֤��ޤ���
+          ICMP_REDIRECTメッセージのゲートウェイアドレスを
+          <A HREF="IPAddress.html"><CODE>IPAddress</CODE></A>として返します。
         </p>
 <DT>
 <A NAME="icmp_id"><CODE>icmp_id</CODE></A>
 <DD>
 <p>
 
-          ���̻Ҥ��֤��ޤ���
+          識別子を返します。
         </p>
 <DT>
 <A NAME="icmp_ip"><CODE>icmp_ip</CODE></A>
 <DD>
 <p>
 
-          ����IP�ǡ���������<A HREF="IPPacket.html"><CODE>IPPacket</CODE></A>�Ȥ����֤��ޤ���
+          元のIPデータグラムを<A HREF="IPPacket.html"><CODE>IPPacket</CODE></A>として返します。
         </p>
 <DT>
 <A NAME="icmp_lifetime"><CODE>icmp_lifetime</CODE></A>
 <DD>
 <p>
 
-          ICMP_ROUTERADVERT��å�������ͭ�����֤��֤��ޤ���
+          ICMP_ROUTERADVERTメッセージの有効時間を返します。
         </p>
 <DT>
 <A NAME="icmp_nextmtu"><CODE>icmp_nextmtu</CODE></A>
 <DD>
 <p>
 
-          ICMP_UNREACH_NEEDFRAG��å������� Next Hop MTU ���֤���
-          ����(����: rfc1191)
+          ICMP_UNREACH_NEEDFRAGメッセージの Next Hop MTU を返しま
+          す。(参照: rfc1191)
         </p>
 <DT>
 <A NAME="icmp_num_addrs"><CODE>icmp_num_addrs</CODE></A>
 <DD>
 <p>
 
-          ICMP_ROUTERADVERT��å������Υ��ɥ쥹�����֤��ޤ���
+          ICMP_ROUTERADVERTメッセージのアドレス数を返します。
         </p>
 <DT>
 <A NAME="icmp_otime"><CODE>icmp_otime</CODE></A>
@@ -109,31 +109,31 @@
 <DD>
 <p>
 
-          ICMP_TSTAMP/ICMP_TSTAMPREPLY��å������Υ����ॹ
-          ����פ�<A HREF="http://www.ruby-lang.org/ja/man-1.4/Time.html"><CODE>Time</CODE></A>�Ȥ����֤��ޤ���
+          ICMP_TSTAMP/ICMP_TSTAMPREPLYメッセージのタイムス
+          タンプを<A HREF="http://www.ruby-lang.org/ja/man-1.4/Time.html"><CODE>Time</CODE></A>として返します。
         </p>
 <DT>
 <A NAME="icmp_pptr"><CODE>icmp_pptr</CODE></A>
 <DD>
 <p>
 
-          ICMP_PARAMPROB��å������Υ��顼�ݥ��󥿤��֤��ޤ���
+          ICMP_PARAMPROBメッセージのエラーポインタを返します。
         </p>
 <DT>
 <A NAME="icmp_radv"><CODE>icmp_radv(<var>nth</var>)</CODE></A>
 <DD>
 <p>
 
-          ICMP_ROUTERADVERT��å�������<VAR>nth</VAR>���ܤΥ��ɥ�
-          ������ȥ���֤��ޤ����֤��ͤ� <CODE>[address,
-          preference]</CODE>�ʤ�2���Ǥ�����Ǥ���
+          ICMP_ROUTERADVERTメッセージの<VAR>nth</VAR>番目のアドレ
+          スエントリを返します。返り値は <CODE>[address,
+          preference]</CODE>なる2要素の配列です。
         </p>
 <DT>
 <A NAME="icmp_seq"><CODE>icmp_seq</CODE></A>
 <DD>
 <p>
 
-          ���������ֹ���֤��ޤ���
+          シーケンス番号を返します。
         </p>
 <DT>
 <A NAME="icmp_seqle"><CODE>icmp_seqle</CODE></A>
@@ -142,17 +142,17 @@
 
           <P>
 
-            ��ȥ륨��ǥ�����Ȥ����ɤߤȤä����������ֹ���֤�
-            �ޤ���
+            リトルエンディアンとして読みとったシーケンス番号を返し
+            ます。
           </P>
 
           <P>
 
-            ¿����<CODE>ping</CODE>���ޥ�ɤμ����ϥ���������
-            ���ۥ��ȥХ��ȥ��������ǽ񤭹��ߤޤ����������äơ�
-            ��ȥ륨��ǥ�����Υۥ��Ȥ����������줿ICMP��å���
-            ���Υ��������ֹ�ϥ�ȥ륨��ǥ�����ˤʤäƤ����
-            ǽ��������ޤ���
+            多くの<CODE>ping</CODE>コマンドの実装はシーケンス番
+            号をホストバイトオーダーで書き込みます。したがって、
+            リトルエンディアンのホストから送信されたICMPメッセー
+            ジのシーケンス番号はリトルエンディアンになっている可
+            能性があります。
           </P>
 
 
@@ -162,22 +162,22 @@
 <DD>
 <p>
 
-          ICMP�����פ��֤��ޤ���
+          ICMPタイプを返します。
         </p>
 <DT>
 <A NAME="icmp_typestr"><CODE>icmp_typestr</CODE></A>
 <DD>
 <p>
 
-          ICMP�����פ�ɽ��ʸ������֤��ޤ���(��: &quot;echo reply&quot;)
+          ICMPタイプを表す文字列を返します。(例: &quot;echo reply&quot;)
         </p>
 <DT>
 <A NAME="icmp_wpa"><CODE>icmp_wpa</CODE></A>
 <DD>
 <p>
 
-          ICMP_ROUTERADVERT��å������Υ��ɥ쥹����ȥ�Ĺ(ñ��:
-          32-bit word)���֤��ޤ���
+          ICMP_ROUTERADVERTメッセージのアドレスエントリ長(単位:
+          32-bit word)を返します。
         </p>
 </DL>
 </DL>

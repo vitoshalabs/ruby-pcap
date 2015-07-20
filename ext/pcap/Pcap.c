@@ -176,7 +176,7 @@ capture_open_live(argc, argv, class)
                       &v_promisc, &v_to_ms);
 
     /* device */
-    Check_SafeStr(v_device);
+    SafeStringValue(v_device);
     device = RSTRING_PTR(v_device);
     /* snaplen */
     if (rs >= 2) {
@@ -232,7 +232,7 @@ capture_open_offline(class, fname)
     DEBUG_PRINT("capture_open_offline");
 
     /* open offline */
-    Check_SafeStr(fname);
+    SafeStringValue(fname);
     pcap = pcap_open_offline(RSTRING_PTR(fname), pcap_errbuf);
     if (pcap == NULL) {
         rb_raise(ePcapError, "%s", pcap_errbuf);
@@ -590,7 +590,7 @@ dumper_open(class, v_cap, v_fname)
 
     CheckClass(v_cap, cCapture);
     GetCapture(v_cap, cap);
-    Check_SafeStr(v_fname);
+    SafeStringValue(v_fname);
 
     pcap_dumper = pcap_dump_open(cap->pcap, RSTRING_PTR(v_fname));
     if (pcap_dumper == NULL) {
