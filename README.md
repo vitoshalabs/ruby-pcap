@@ -1,3 +1,7 @@
+# no longer maintained
+
+I'm no longer actively maintaining this project, get in touch if you're interested in taking it over.
+
 ## ruby-pcap
 
 [![Build Status](https://travis-ci.org/ickymettle/ruby-pcap.svg)](https://travis-ci.org/ickymettle/ruby-pcap)
@@ -25,10 +29,6 @@ Directory 'examples' contains some simple scripts.
 ## Author
 
 Masaki Fukushima <fukusima@goto.info.waseda.ac.jp>
-
-## Maintained by
-
-Marcus Barczak <mbarczak@etsy.com>
 
 ## Copyright
 
