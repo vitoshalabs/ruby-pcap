@@ -324,30 +324,33 @@ capture_dispatch(argc, argv, self)
      VALUE *argv;
      VALUE self;
 {
-    VALUE v_cnt;
-    int cnt;
+    VALUE v_cnt, v_opts;
+    int ret = 0, cnt = 0;
+    unsigned int cap_cnt = 0;
     struct capture_object *cap;
-    int ret;
+    void *default_handler;
 
     DEBUG_PRINT("capture_dispatch");
     GetCapture(self, cap);
 
     /* scan arg */
-    if (rb_scan_args(argc, argv, "01", &v_cnt) >= 1) {
-        FIXNUM_P(v_cnt);
-        cnt = FIX2INT(v_cnt);
+    rb_scan_args(argc, argv, "02", &v_cnt, &v_opts);
+    if (NIL_P(v_cnt)) {
+      cnt = -1;
     } else {
         cnt = -1;
     }
-
-    MAYBE_TRAP_BEG;
-    ret = pcap_dispatch(cap->pcap, cnt, handler, (u_char *)cap);
-    MAYBE_TRAP_END;
-    if (ret == -1) {
+    // call dispatch with 10,000 and break if we have reached desired amount
+    // if dispatch is called with -1/0 sometimes it dispatches millions of packets
+    for (cap_cnt = 0; cap_cnt < cnt; cap_cnt += ret ) {
+      MAYBE_TRAP_BEG;
+      ret = pcap_dispatch(cap->pcap, 10000, default_handler, (u_char *)cap);
+      MAYBE_TRAP_END;
+      if (ret < 0) {
         rb_raise(ePcapError, "dispatch: %s", pcap_geterr(cap->pcap));
+      }
     }
-
-    return INT2FIX(ret);
+  return UINT2NUM(cap_cnt);
 }
 
 static VALUE
@@ -373,25 +376,46 @@ capture_loop(argc, argv, self)
      VALUE *argv;
      VALUE self;
 {
-    VALUE v_cnt;
+    VALUE v_cnt, v_opts;
     int cnt;
     struct capture_object *cap;
     int ret;
+    void *default_handler;
 
     DEBUG_PRINT("capture_loop");
     GetCapture(self, cap);
 
     /* scan arg */
-    if (rb_scan_args(argc, argv, "01", &v_cnt) >= 1) {
-        FIXNUM_P(v_cnt);
-        cnt = FIX2INT(v_cnt);
+    rb_scan_args(argc, argv, "02", &v_cnt, &v_opts);
+    if (NIL_P(v_cnt)) {
+      cnt = -1;
     } else {
-        cnt = -1;
+      FIXNUM_P(v_cnt);
+      cnt = FIX2INT(v_cnt);
     }
+    // if no second argument is supplied, use default handler
+    if (NIL_P(v_opts)) {
+      default_handler = &handler;
+    } else {
+      // raise error if second argument is not a symbol
+      Check_Type(v_opts, T_SYMBOL);
+      // only :source, :destination are supported
+      if (SYM2ID(v_opts) == rb_intern("source")) {
+        DEBUG_PRINT("yeilding only source ip addresses");
+        default_handler = &src_ip_addr_handler;
+      } else if (SYM2ID(v_opts) == rb_intern("destination")) {
+        DEBUG_PRINT("yeilding only destination ip addresses");
+        default_handler = &dst_ip_addr_handler;
+      } else {
+        // unkonw keyword passed, use default capture handler
+        DEBUG_PRINT("unknown option, using default capture handler");
+        default_handler = &handler;
+      }
+     }
 
     if (pcap_file(cap->pcap) != NULL) {
         MAYBE_TRAP_BEG;
-        ret = pcap_loop(cap->pcap, cnt, handler, (u_char *)cap);
+        ret = pcap_loop(cap->pcap, cnt, default_handler, (u_char *)cap);
         MAYBE_TRAP_END;
     }
     else {
@@ -409,7 +433,7 @@ capture_loop(argc, argv, self)
                     rb_thread_wait_fd(fd);
                 }
                 MAYBE_TRAP_BEG;
-                ret = pcap_dispatch(cap->pcap, 1, handler, (u_char *)cap);
+                ret = pcap_dispatch(cap->pcap, 1, default_handler, (u_char *)cap);
                 MAYBE_TRAP_END;
             } while (ret == 0);
 
