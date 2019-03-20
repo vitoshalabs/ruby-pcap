@@ -339,6 +339,29 @@ src_ip_addr_handler(cap, pkthdr, data)
   rb_yield(SRC_ADDR(data));
 }
 
+void parse_opts(VALUE v_opts, void **default_handler)
+{
+  if (NIL_P(v_opts)) {
+    DEBUG_PRINT("using default capture handler");
+    *default_handler = &handler;
+  } else {
+    // raise error if second argument is not a symbol
+    Check_Type(v_opts, T_SYMBOL);
+    // only :source, :destination are supported
+    if (SYM2ID(v_opts) == rb_intern("source")) {
+      DEBUG_PRINT("yeilding only source ip addresses");
+      *default_handler = &src_ip_addr_handler;
+    } else if (SYM2ID(v_opts) == rb_intern("destination")) {
+      DEBUG_PRINT("yeilding only destination ip addresses");
+      *default_handler = &dst_ip_addr_handler;
+    } else {
+      // unkonw keyword passed, use default capture handler
+      DEBUG_PRINT("unknown option, using default capture handler");
+      *default_handler = &handler;
+    }
+  }
+}
+
 static VALUE
 capture_dispatch(argc, argv, self)
      int argc;
@@ -359,8 +382,10 @@ capture_dispatch(argc, argv, self)
     if (NIL_P(v_cnt)) {
       cnt = -1;
     } else {
-        cnt = -1;
+      FIXNUM_P(v_cnt);
+      cnt = FIX2INT(v_cnt);
     }
+    parse_opts(v_opts, &default_handler);
     // call dispatch with 10,000 and break if we have reached desired amount
     // if dispatch is called with -1/0 sometimes it dispatches millions of packets
     for (cap_cnt = 0; cap_cnt < cnt; cap_cnt += ret ) {
@@ -414,26 +439,7 @@ capture_loop(argc, argv, self)
       FIXNUM_P(v_cnt);
       cnt = FIX2INT(v_cnt);
     }
-    // if no second argument is supplied, use default handler
-    if (NIL_P(v_opts)) {
-      default_handler = &handler;
-    } else {
-      // raise error if second argument is not a symbol
-      Check_Type(v_opts, T_SYMBOL);
-      // only :source, :destination are supported
-      if (SYM2ID(v_opts) == rb_intern("source")) {
-        DEBUG_PRINT("yeilding only source ip addresses");
-        default_handler = &src_ip_addr_handler;
-      } else if (SYM2ID(v_opts) == rb_intern("destination")) {
-        DEBUG_PRINT("yeilding only destination ip addresses");
-        default_handler = &dst_ip_addr_handler;
-      } else {
-        // unkonw keyword passed, use default capture handler
-        DEBUG_PRINT("unknown option, using default capture handler");
-        default_handler = &handler;
-      }
-     }
-
+    parse_opts(v_opts, &default_handler);
     if (pcap_file(cap->pcap) != NULL) {
         MAYBE_TRAP_BEG;
         ret = pcap_loop(cap->pcap, cnt, default_handler, (u_char *)cap);
