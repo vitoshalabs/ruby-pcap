@@ -14,8 +14,7 @@ static VALUE cIPAddress;
 
 static unsigned short in_cksum(unsigned char *data, int len);
 
-#define CheckTruncateIp(pkt, need) \
-    CheckTruncate(pkt, pkt->hdr.layer3_off, need, "truncated IP")
+#define CheckTruncateIp(pkt, need)  CheckTruncate(pkt, pkt->hdr.layer3_off, need, "truncated IP")
 
 VALUE
 setup_ip_packet(pkt, nl_len)
@@ -431,8 +430,4 @@ Init_ip_packet(void)
 
     rb_define_method(cIPAddress, "_dump", ipaddr_dump, 1);
     rb_define_singleton_method(cIPAddress, "_load", ipaddr_s_load, 1);
-
-    Init_tcp_packet();
-    Init_udp_packet();
-    Init_icmp_packet();
 }
