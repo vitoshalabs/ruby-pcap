@@ -15,6 +15,12 @@ module Pcap
     end
   end
 
+  class IPv6Packet
+    def to_s
+      "#{src_s} > #{dst_s} next header #{ip_nh}"
+    end
+  end
+
   class TCPPacket
     def tcp_data_len
       ip_len - 4 * (ip_hlen + tcp_hlen)
@@ -59,6 +65,28 @@ module Pcap
     end
   end
 
+  class TCPv6Packet
+
+    def tcp_flags_s
+      return \
+  (tcp_urg? ? 'U' : '.') +
+  (tcp_ack? ? 'A' : '.') +
+  (tcp_psh? ? 'P' : '.') +
+  (tcp_rst? ? 'R' : '.') +
+  (tcp_syn? ? 'S' : '.') +
+        (tcp_fin? ? 'F' : '.')
+    end
+    
+    def to_s
+      "#{src_s}:#{sport} > #{dst_s}:#{dport} #{tcp_flags_s}"
+    end
+  end
+
+  class UDPv6Packet
+    def to_s
+      "#{src_s}:#{sport} > #{dst_s}:#{dport} len #{udp_len} sum #{udp_sum}"
+    end
+  end
   #
   # Backword compatibility
   #
