@@ -322,7 +322,7 @@ handler(cap, pkthdr, data)
 #define SRC_ADDR(data)  INT2FIX(ntohl(*((unsigned int *) (data + 26))))
 
 static void
-dst_ip_addr_handler(cap, pkthdr, data)
+dst_ipv4_addr_handler(cap, pkthdr, data)
      struct capture_object *cap;
      const struct pcap_pkthdr *pkthdr;
      const u_char *data;
@@ -331,12 +331,33 @@ dst_ip_addr_handler(cap, pkthdr, data)
 }
 
 static void
-src_ip_addr_handler(cap, pkthdr, data)
+src_ipv4_addr_handler(cap, pkthdr, data)
      struct capture_object *cap;
      const struct pcap_pkthdr *pkthdr;
      const u_char *data;
 {
   rb_yield(SRC_ADDR(data));
+}
+
+#define SRCV6_ADDR(data)  rb_integer_unpack((u_char *) (data + 22), 16, 1, 0, INTEGER_PACK_BIG_ENDIAN)
+#define DSTV6_ADDR(data)  rb_integer_unpack((u_char *) (data + 38), 16, 1, 0, INTEGER_PACK_BIG_ENDIAN)
+
+static void
+dst_ipv6_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(DSTV6_ADDR(data));
+}
+
+static void
+src_ipv6_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(SRCV6_ADDR(data));
 }
 
 void parse_opts(VALUE v_opts, void **default_handler)
@@ -349,11 +370,17 @@ void parse_opts(VALUE v_opts, void **default_handler)
     Check_Type(v_opts, T_SYMBOL);
     // only :source, :destination are supported
     if (SYM2ID(v_opts) == rb_intern("source")) {
-      DEBUG_PRINT("yeilding only source ip addresses");
-      *default_handler = &src_ip_addr_handler;
+      DEBUG_PRINT("yeilding only source ipv4 addresses");
+      *default_handler = &src_ipv4_addr_handler;
     } else if (SYM2ID(v_opts) == rb_intern("destination")) {
-      DEBUG_PRINT("yeilding only destination ip addresses");
-      *default_handler = &dst_ip_addr_handler;
+      DEBUG_PRINT("yeilding only destination ipv4 addresses");
+      *default_handler = &dst_ipv4_addr_handler;
+    } else if (SYM2ID(v_opts) == rb_intern("destinationv6")) {
+        DEBUG_PRINT("yeilding only destination ipv6 addresses");
+        *default_handler = &dst_ipv6_addr_handler;
+    } else if (SYM2ID(v_opts) == rb_intern("sourcev6")) {
+        DEBUG_PRINT("yeilding only source ipv6 addresses");
+        *default_handler = &src_ipv6_addr_handler;
     } else {
       // unkonw keyword passed, use default capture handler
       DEBUG_PRINT("unknown option, using default capture handler");
