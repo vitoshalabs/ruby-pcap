@@ -3,7 +3,6 @@
  */
 
 #include "ruby_pcap.h"
-#include <netdb.h>
 
 VALUE cIPv6Packet;
 
