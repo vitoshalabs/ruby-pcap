@@ -40,12 +40,10 @@ static VALUE\
 (func)(self)\
      VALUE self;\
 {\
-    struct packet_object *pkt;\
     struct ip6_hdr *ip;\
 \
     DEBUG_PRINT(#func);\
-    GetPacket(self, pkt);\
-    ip = IPV6_HDR(pkt);\
+    ip = IPV6_HDR_OBJ(self);\
     return (val);\
 }
 
@@ -88,8 +86,8 @@ ipp_data(self)
     int len;
 
     GetPacket(self, pkt);
-    CheckTruncateIpv6(pkt, 20);
     ip = IPV6_HDR(pkt);
+    CheckTruncateIpv6(pkt, 20);
     len = pkt->hdr.pkthdr.caplen - pkt->hdr.layer3_off - IPV6_HL;
     return rb_str_new((u_char *)ip + IPV6_HL, len);
 }
@@ -102,10 +100,8 @@ static VALUE
 ipp_src_i(self)
     VALUE self;
 {
-  struct packet_object *pkt;
   struct ip6_hdr *ip;
-  GetPacket(self, pkt);
-  ip = IPV6_HDR(pkt);
+  ip = (struct ip6_hdr *)IPV6_HDR_OBJ(self);
   return rb_integer_unpack(ip->ip6_src.s6_addr, 16, 1, 0, INTEGER_PACK_BIG_ENDIAN);
 }
 
@@ -113,11 +109,9 @@ static VALUE
 ipp_src_s(self)
   VALUE self;
 {
-  struct packet_object *pkt;
   struct ip6_hdr *ip;
-  GetPacket(self, pkt);
-  ip = IPV6_HDR(pkt);
   char buff[INET6_ADDRSTRLEN];
+  ip = (struct ip6_hdr *)IPV6_HDR_OBJ(self);
 
   inet_ntop(AF_INET6, ip->ip6_src.s6_addr, buff, INET6_ADDRSTRLEN);
   return rb_str_new2(buff);
@@ -127,10 +121,8 @@ static VALUE
 ipp_dst_i(self)
     VALUE self;
 {
-  struct packet_object *pkt;
   struct ip6_hdr *ip;
-  GetPacket(self, pkt);
-  ip = IPV6_HDR(pkt);
+  ip = IPV6_HDR_OBJ(self);
   return rb_integer_unpack(ip->ip6_dst.s6_addr, 16, 1, 0, INTEGER_PACK_BIG_ENDIAN);
 }
 
@@ -138,11 +130,9 @@ static VALUE
 ipp_dst_s(self)
   VALUE self;
 {
-  struct packet_object *pkt;
-  struct ip6_hdr *ip;
-  GetPacket(self, pkt);
-  ip = IPV6_HDR(pkt);
   char buff[INET6_ADDRSTRLEN];
+  struct ip6_hdr *ip;
+  ip = IPV6_HDR_OBJ(self);
 
   inet_ntop(AF_INET6, ip->ip6_dst.s6_addr, buff, INET6_ADDRSTRLEN);
   return rb_str_new2(buff);

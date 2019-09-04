@@ -129,6 +129,7 @@ VALUE setup_tcpv6_packet(struct packet_object *, int);
 
 /* ipv6_packet.c */
 #define IPV6_HDR(pkt)     ((struct ip6_hdr *)LAYER3_HDR(pkt))
+#define IPV6_HDR_OBJ(self) ((struct ip6_hdr *)LAYER3_HDR((struct packet_object *)DATA_PTR(self)))
 extern VALUE cIPv6Packet;
 void Init_ipv6_packet(void);
 VALUE setup_ipv6_packet(struct packet_object *, int);
