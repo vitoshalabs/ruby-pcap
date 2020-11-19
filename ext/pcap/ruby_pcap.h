@@ -154,4 +154,11 @@ VALUE setup_icmpv6_packet(struct packet_object *);
 extern VALUE cARPPacket;
 void Init_arp_packet(void);
 VALUE setup_arp_packet(struct packet_object *, int);
+
+/* slow_protocol_packet.c */
+extern VALUE cSPPacket;
+extern VALUE cLACPPacket;
+void Init_sp_packet(void);
+VALUE setup_slow_protocol_packet(struct packet_object *, int);
 #endif /* RUBY_PCAP_H */
+

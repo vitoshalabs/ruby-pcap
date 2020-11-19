@@ -12,7 +12,11 @@
 #include <net/if.h>
 #include <netinet/if_ether.h>
 #ifndef ETH_P_IPV6
-#define ETH_P_IPV6	0x86DD /* IPv6 packect */
+#define ETH_P_IPV6 0x86DD /* IPv6 packet */
+#endif
+
+#ifndef ETH_P_SLOW
+#define ETH_P_SLOW 0x8809 /* Slow Protocol frame */
 #endif
 
 #ifndef ETH_P_ARP
@@ -136,6 +140,9 @@ new_packet(data, pkthdr, dl_type)
             break;
         case ETH_P_ARP:
             class = setup_arp_packet(pkt, nl_len);
+            break;
+        case ETH_P_SLOW:
+            class = setup_slow_protocol_packet(pkt, nl_len);
             break;
         }
     }
@@ -299,6 +306,8 @@ PACKET_METHOD(packet_time, rb_time_new(pkt->hdr.pkthdr.ts.tv_sec,
 PACKET_METHOD(packet_time_i, rb_int2inum(pkt->hdr.pkthdr.ts.tv_sec));
 PACKET_METHOD(packet_raw_data, rb_str_new(pkt->data, pkt->hdr.pkthdr.caplen));
 PACKET_METHOD(packet_arp, rb_obj_is_kind_of(self, cARPPacket));
+PACKET_METHOD(packet_lacp, rb_obj_is_kind_of(self, cLACPPacket));
+
 
 void
 Init_packet(void)
@@ -322,6 +331,7 @@ Init_packet(void)
     rb_define_method(cPacket, "ipv6?", packet_ipv6, 0);
     rb_define_method(cPacket, "tcp?", packet_tcp, 0);
     rb_define_method(cPacket, "udp?", packet_udp, 0);
+    rb_define_method(cPacket, "lacp?", packet_lacp, 0);
     rb_define_method(cPacket, "length", packet_length, 0);
     rb_define_method(cPacket, "size", packet_length, 0);
     rb_define_method(cPacket, "caplen", packet_caplen, 0);
@@ -342,4 +352,5 @@ Init_packet(void)
     Init_udp_packet();
     Init_icmp_packet();
     Init_icmpv6_packet();
+    Init_sp_packet();
 }
