@@ -121,7 +121,7 @@ tcpp_csumok(self)
     long sum = 0;
     unsigned short *temp = (unsigned short *)tcp;
     int len = ntohs(ip->ip_len) - ip->ip_hl*4; // length of ip data
-    int csum = ntohs(tcp->th_sum); // keep the checksum in packet
+    unsigned short csum = ntohs(tcp->th_sum); // keep the checksum in packet
 
     // pseudo header sum
     sum += ntohs(*(ip_src++));
@@ -142,7 +142,7 @@ tcpp_csumok(self)
       sum = (sum & 0xFFFF) + (sum >> 16);
     unsigned short answer = ~sum;
 
-    tcp->th_sum = csum; //restore the checkum in packet
+    tcp->th_sum = htons(csum); //restore the checkum in packet
     if (DEBUG_CHECKSUM)
       printf("TCP csum in packet:%d should be %d\n", csum, answer);
     if (answer == csum)
@@ -173,6 +173,124 @@ tcpp_data_len(self)
     GetPacket(self, pkt);
 
     return INT2FIX(TCP_DATALEN(pkt));
+}
+
+/*
+  Calculate TCP checksum and update it in packet
+*/
+static VALUE
+tcpp_csum_update(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    struct tcphdr *tcp;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    tcp = TCP_HDR(pkt);
+    unsigned short *ip_src = (void *)&ip->ip_src.s_addr;
+    unsigned short *ip_dst = (void *)&ip->ip_dst.s_addr;
+    long sum = 0;
+    /* save checksum in packet */
+    unsigned short th_sum = ntohs(tcp->th_sum);
+    unsigned short *temp = (unsigned short *)tcp;
+    int len = ntohs(ip->ip_len) - ip->ip_hl*4; // length of ip data
+
+    // pseudo header sum
+    sum += ntohs(*(ip_src++));
+    sum += ntohs(*ip_src);
+    sum += ntohs(*(ip_dst++));
+    sum += ntohs(*ip_dst);
+    sum += 6;
+    sum += len;
+    // set checksum to zero and sum
+    tcp->th_sum = 0;
+    while(len > 1){
+      sum += ntohs(*temp++);
+      len -= 2;
+    }
+    if(len)
+      sum += ntohs((unsigned short) *((unsigned char *)temp));
+    while(sum>>16)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+    unsigned short answer = ~sum;
+    /*
+     * set checkum in packet
+     */
+    tcp->th_sum = htons(answer);
+    /*
+     * no change, return nil
+     */
+    if (answer == th_sum)
+      return Qnil;
+    /*
+     * return new checkum
+     */
+    return UINT2NUM(answer);
+}
+
+/*
+ * Set TCP source port and update checksum
+*/
+static VALUE
+tcpp_sport_set(self, val)
+     VALUE self, val;
+{
+    struct packet_object *pkt;
+    struct tcphdr *tcp;
+    GetPacket(self, pkt);
+    tcp = TCP_HDR(pkt);
+    long sum = 0;
+    /*
+     * https://tools.ietf.org/html/rfc1624
+     * HC' = ~(C + (-m) + m')
+    */
+    sum = ~(~ntohs(tcp->th_sum) - ntohs(tcp->th_sport) + NUM2USHORT(val));
+    while(sum>>16)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+    /*
+     * ttps://tools.ietf.org/html/rfc1624 boundary conditions
+    */
+    if (sum == 0xFFFF)
+      sum = ~sum;
+    /*
+     * set desired value and new checksum
+    */
+    tcp->th_sport = htons(NUM2USHORT(val));
+    tcp->th_sum = htons(sum);
+    return val;
+}
+
+/*
+  Set TCP destination port and update checksum
+*/
+static VALUE
+tcpp_dport_set(self, val)
+     VALUE self, val;
+{
+    struct packet_object *pkt;
+    struct tcphdr *tcp;
+    GetPacket(self, pkt);
+    tcp = TCP_HDR(pkt);
+    long sum = 0;
+    /*
+     * https://tools.ietf.org/html/rfc1624
+     * HC' = ~(C + (-m) + m')
+    */
+    sum = ~(~ntohs(tcp->th_sum) - ntohs(tcp->th_dport) + NUM2USHORT(val));
+    while(sum>>16)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+    /*
+     * ttps://tools.ietf.org/html/rfc1624 boundary conditions
+    */
+    if (sum == 0xFFFF)
+      sum = ~sum;
+    /*
+     * set desired value and new checksum
+    */
+    tcp->th_dport = htons(NUM2USHORT(val));
+    tcp->th_sum = htons(sum);
+    return val;
 }
 
 /*
@@ -244,7 +362,7 @@ tcpp_csumokv6(self)
     unsigned long sum = 0;
     unsigned short *temp = (unsigned short *)tcp;
     int len = ntohs(ip->ip6_plen); // length of ip data
-    int csum = ntohs(tcp->th_sum); // keep the checksum in packet
+    unsigned short csum = ntohs(tcp->th_sum); // keep the checksum in packet
 
     // pseudo header sum
     int i = 1;
@@ -268,7 +386,7 @@ tcpp_csumokv6(self)
       sum = (sum & 0xFFFF) + (sum >> 16);
     unsigned short answer = ~sum;
 
-    tcp->th_sum = csum; //restore the checkum in packet
+    tcp->th_sum = htons(csum); //restore the checkum in packet
     if (DEBUG_CHECKSUM)
       printf("TCPv6 csum in packet:%d should be %d\n", csum, answer);
     if (answer == csum)
@@ -285,9 +403,13 @@ Init_tcp_packet(void)
     cTCPPacket = rb_define_class_under(mPcap, "TCPPacket", cIPPacket);
     /* define methods under IPv4 */
     rb_define_method(cTCPPacket, "tcp_sport", tcpp_sport, 0);
+    rb_define_method(cTCPPacket, "tcp_sport=", tcpp_sport_set, 1);
     rb_define_method(cTCPPacket, "sport", tcpp_sport, 0);
+    rb_define_method(cTCPPacket, "sport=", tcpp_sport_set, 1);
     rb_define_method(cTCPPacket, "tcp_dport", tcpp_dport, 0);
+    rb_define_method(cTCPPacket, "tcp_dport=", tcpp_dport_set, 1);
     rb_define_method(cTCPPacket, "dport", tcpp_dport, 0);
+    rb_define_method(cTCPPacket, "dport=", tcpp_dport_set, 1);
     rb_define_method(cTCPPacket, "tcp_seq", tcpp_seq, 0);
     rb_define_method(cTCPPacket, "tcp_ack", tcpp_acknum, 0);
     rb_define_method(cTCPPacket, "tcp_off", tcpp_off, 0);
@@ -307,6 +429,7 @@ Init_tcp_packet(void)
     rb_define_method(cTCPPacket, "tcp_options", tcpp_options, 0);
     rb_define_method(cTCPPacket, "tcp_csum_ok?", tcpp_csumok, 0);
     rb_define_method(cTCPPacket, "tcp_truncated?", tcpp_truncated, 0);
+    rb_define_method(cTCPPacket, "tcp_csum_update!", tcpp_csum_update, 0);
 
     // IPv6
     cTCPv6Packet = rb_define_class_under(mPcap, "TCPv6Packet", cIPv6Packet);
