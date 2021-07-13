@@ -7,7 +7,6 @@
  */
 
 #include "ruby_pcap.h"
-#include "rubysig.h"
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
