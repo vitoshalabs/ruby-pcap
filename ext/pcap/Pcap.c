@@ -318,6 +318,27 @@ handler(cap, pkthdr, data)
     rb_yield(new_packet(data, pkthdr, cap->dl_type));
 }
 
+#define DST_ADDR(data)  INT2FIX(ntohl(*((unsigned int *) (data + 30))))
+#define SRC_ADDR(data)  INT2FIX(ntohl(*((unsigned int *) (data + 26))))
+
+static void
+dst_ip_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(DST_ADDR(data));
+}
+
+static void
+src_ip_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(SRC_ADDR(data));
+}
+
 static VALUE
 capture_dispatch(argc, argv, self)
      int argc;

@@ -89,11 +89,16 @@ struct packet_object {
         rb_raise(eTruncatedPacket, (emsg)) : 0 \
 )
 
+#define IsTruncated(pkt, from, need) (\
+    (from) + (need) > (pkt)->hdr.pkthdr.caplen ? \
+        1 : 0 \
+)
 #define IsKindOf(v, class) RTEST(rb_obj_is_kind_of(v, class))
 #define CheckClass(v, class) ((IsKindOf(v, class)) ? 0 :\
     rb_raise(rb_eTypeError, "wrong type %s (expected %s)",\
         rb_class2name(CLASS_OF(v)), rb_class2name(class)))
 
+#define DEBUG_CHECKSUM 0
 
 /* Pcap.c */
 extern VALUE mPcap, rbpcap_convert;
@@ -130,5 +135,10 @@ VALUE setup_udp_packet(struct packet_object *, int);
 extern VALUE cICMPPacket;
 void Init_icmp_packet(void);
 VALUE setup_icmp_packet(struct packet_object *, int);
+
+/* arp_packet.c */
+extern VALUE cARPPacket;
+void Init_arp_packet(void);
+VALUE setup_arp_packet(struct packet_object *, int);
 
 #endif /* RUBY_PCAP_H */

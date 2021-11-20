@@ -78,6 +78,67 @@ udpp_data(self)
     return rb_str_new(UDP_DATA(pkt), len);
 }
 
+static VALUE
+udpp_csumok(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    struct udphdr *udp;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    udp = UDP_HDR(pkt);
+    unsigned short *ip_src = (void *)&ip->ip_src.s_addr;
+    unsigned short *ip_dst = (void *)&ip->ip_dst.s_addr;
+    long sum = 0;
+    unsigned short answer = 0;
+    unsigned short *temp = (unsigned short *)udp;
+    int len = ntohs(ip->ip_len) - ip->ip_hl*4; // length of ip data
+    int csum = ntohs(udp->uh_sum); // keep the checksum in packet
+
+    // pseudo header sum
+    sum += ntohs(*(ip_src++));
+    sum += ntohs(*ip_src);
+    sum += ntohs(*(ip_dst++));
+    sum += ntohs(*ip_dst);
+    sum += 17;
+    sum += len;
+    // set checksum to zero and sum
+    udp->uh_sum = 0;
+    while (len > 1){
+      sum += ntohs(*temp++);
+      len -= 2;
+    }
+    if (len)
+      sum += ntohs((unsigned short) *((unsigned char *)temp));
+    while(sum>>16)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+
+    answer = ~sum;
+    if (answer == 0)
+      answer = ~answer;
+    udp->uh_sum = csum; //restore the checkum in packet
+    if (DEBUG_CHECKSUM)
+      printf("UDP csum in packet:%d should be %d\n", csum, answer);
+    if (answer == csum)
+      return Qtrue;
+    return Qfalse;
+}
+static VALUE
+udpp_truncated(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    struct udphdr *udp;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    udp = UDP_HDR(pkt);
+    if IsTruncated(pkt, pkt->hdr.layer3_off, ip->ip_hl * 4 + ntohs(udp->uh_ulen))
+        return Qtrue;
+    return Qfalse;
+}
+
 void
 Init_udp_packet(void)
 {
@@ -93,4 +154,6 @@ Init_udp_packet(void)
     rb_define_method(cUDPPacket, "udp_len", udpp_len, 0);
     rb_define_method(cUDPPacket, "udp_sum", udpp_sum, 0);
     rb_define_method(cUDPPacket, "udp_data", udpp_data, 0);
+    rb_define_method(cUDPPacket, "udp_csum_ok?", udpp_csumok, 0);
+    rb_define_method(cUDPPacket, "udp_truncated?", udpp_truncated, 0);
 }

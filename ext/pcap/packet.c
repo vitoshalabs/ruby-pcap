@@ -12,6 +12,9 @@
 #include <net/if.h>
 #include <netinet/if_ether.h>
 
+#ifndef ETH_P_ARP
+#define ETH_P_ARP	0x0806		/* Address Resolution packet	*/
+#endif
 #define DL_HDR(pkt)     ((u_char *)LAYER2_HDR(pkt))
 #define DL_DATA(pkt)    ((u_char *)LAYER3_HDR(pkt))
 
@@ -124,6 +127,9 @@ new_packet(data, pkthdr, dl_type)
         switch (nl_type) {
         case ETHERTYPE_IP:
             class = setup_ip_packet(pkt, nl_len);
+            break;
+        case ETH_P_ARP:
+            class = setup_arp_packet(pkt, nl_len);
             break;
         }
     }
@@ -290,6 +296,7 @@ PACKET_METHOD(packet_time, rb_time_new(pkt->hdr.pkthdr.ts.tv_sec,
                                        pkt->hdr.pkthdr.ts.tv_usec));
 PACKET_METHOD(packet_time_i, rb_int2inum(pkt->hdr.pkthdr.ts.tv_sec));
 PACKET_METHOD(packet_raw_data, rb_str_new(pkt->data, pkt->hdr.pkthdr.caplen));
+PACKET_METHOD(packet_arp, rb_obj_is_kind_of(self, cARPPacket));
 
 void
 Init_packet(void)
@@ -308,6 +315,7 @@ Init_packet(void)
     rb_define_method(cPacket, "udata", packet_get_udata, 0);
     rb_define_method(cPacket, "udata=", packet_set_udata, 1);
     rb_define_method(cPacket, "datalink", packet_datalink, 0);
+    rb_define_method(cPacket, "arp?", packet_arp, 0);
     rb_define_method(cPacket, "ip?", packet_ip, 0);
     rb_define_method(cPacket, "tcp?", packet_tcp, 0);
     rb_define_method(cPacket, "udp?", packet_udp, 0);
@@ -325,4 +333,5 @@ Init_packet(void)
     id_load = rb_intern("load");
     id_dump = rb_intern("dump");
     Init_ip_packet();
+    Init_arp_packet();
 }

@@ -232,6 +232,40 @@ icmpp_radv(self, ind)
     rb_ary_push(ary, INT2NUM(ntohl(IDRD(icmp)->ird_pref)));
     return ary;
 }
+static VALUE
+icmpp_csumok(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    struct icmp *icmp;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    icmp = ICMP_HDR(pkt);
+
+    long sum = 0;
+    unsigned short *temp = (unsigned short *)icmp;
+    int len = ntohs(ip->ip_len) - ip->ip_hl*4; // length of ip data
+    int csum = ntohs(icmp->icmp_cksum); // keep the checksum in packet
+
+    icmp->icmp_cksum = 0;
+    while(len > 1){
+      sum += ntohs(*temp++);
+      len -= 2;
+    }
+    if(len)
+      sum += ntohs((unsigned short) *((unsigned char *)temp));
+    while(sum>>16)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+    unsigned short answer = ~sum;
+
+    icmp->icmp_cksum = csum; //restore the checkum in packet
+    if (DEBUG_CHECKSUM)
+      printf("ICMP csum in packet:%d should be %d\n", csum, answer);
+    if (answer == csum)
+      return Qtrue;
+    return Qfalse;
+}
 
 #define time_new_msec(t) rb_time_new((t)/1000, (t)%1000 * 1000)
 ICMPP_METHOD(icmpp_otime, 12, time_new_msec(ntohl(icmp->icmp_otime)))
@@ -336,6 +370,7 @@ Init_icmp_packet(void)
     rb_define_method(cICMPPacket, "icmp_typestr",  icmpp_typestr, 0);
     rb_define_method(cICMPPacket, "icmp_code",     icmpp_code, 0);
     rb_define_method(cICMPPacket, "icmp_cksum",    icmpp_cksum, 0);
+    rb_define_method(cICMPPacket, "icmp_csum_ok?", icmpp_csumok, 0);
 
     klass = rb_define_class_under(mPcap, "ICMPEchoReply", cICMPPacket);
     icmp_types[ICMP_ECHOREPLY].klass = klass;

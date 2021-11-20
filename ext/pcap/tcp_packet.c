@@ -14,6 +14,9 @@
 #define TCP_DATALEN(pkt) (ntohs(IP_HDR(pkt)->ip_len) - \
     (IP_HDR(pkt)->ip_hl + TCP_HDR(pkt)->th_off) * 4)
 
+#define TCP_OPTIONS(pkt)  ((u_char *) &TCP_HDR(pkt)->th_urp + 2)
+#define TCP_OPTIONS_LEN(pkt) (((TCP_HDR(pkt)->th_off) * 4) - 20)
+
 VALUE cTCPPacket;
 
 #define CheckTruncateTcp(pkt, need) \
@@ -78,7 +81,6 @@ tcpp_data(self)
      VALUE self;
 {
     struct packet_object *pkt;
-    VALUE v_len;
     int len;
 
     DEBUG_PRINT("tcpp_data");
@@ -89,6 +91,89 @@ tcpp_data(self)
     len = MIN(Caplen(pkt, pkt->hdr.layer5_off), TCP_DATALEN(pkt));
     if (len < 1) return Qnil;
     return rb_str_new(TCP_DATA(pkt), len);
+}
+
+static VALUE
+tcpp_options(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    int len;
+
+    DEBUG_PRINT("tcpp_options");
+    GetPacket(self, pkt);
+    len = TCP_OPTIONS_LEN(pkt);
+    if (len < 1 ) return Qnil;
+    return rb_str_new(TCP_OPTIONS(pkt), len);
+}
+
+static VALUE
+tcpp_csumok(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    struct tcphdr *tcp;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    tcp = TCP_HDR(pkt);
+    unsigned short *ip_src = (void *)&ip->ip_src.s_addr;
+    unsigned short *ip_dst = (void *)&ip->ip_dst.s_addr;
+    long sum = 0;
+    unsigned short *temp = (unsigned short *)tcp;
+    int len = ntohs(ip->ip_len) - ip->ip_hl*4; // length of ip data
+    int csum = ntohs(tcp->th_sum); // keep the checksum in packet
+
+    // pseudo header sum
+    sum += ntohs(*(ip_src++));
+    sum += ntohs(*ip_src);
+    sum += ntohs(*(ip_dst++));
+    sum += ntohs(*ip_dst);
+    sum += 6;
+    sum += len;
+    // set checksum to zero and sum
+    tcp->th_sum = 0;
+    while(len > 1){
+      sum += ntohs(*temp++);
+      len -= 2;
+    }
+    if(len)
+      sum += ntohs((unsigned short) *((unsigned char *)temp));
+    while(sum>>16)
+      sum = (sum & 0xFFFF) + (sum >> 16);
+    unsigned short answer = ~sum;
+
+    tcp->th_sum = csum; //restore the checkum in packet
+    if (DEBUG_CHECKSUM)
+      printf("TCP csum in packet:%d should be %d\n", csum, answer);
+    if (answer == csum)
+      return Qtrue;
+    return Qfalse;
+}
+
+static VALUE
+tcpp_truncated(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    struct tcphdr *tcp;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    tcp = TCP_HDR(pkt);
+    if IsTruncated(pkt, pkt->hdr.layer3_off, ip->ip_hl * 4 + tcp->th_off * 4)
+        return Qtrue;
+    return Qfalse;
+}
+
+static VALUE
+tcpp_data_len(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    GetPacket(self, pkt);
+
+    return INT2FIX(TCP_DATALEN(pkt));
 }
 
 void
@@ -118,4 +203,8 @@ Init_tcp_packet(void)
     rb_define_method(cTCPPacket, "tcp_ack?", tcpp_ack, 0);
     rb_define_method(cTCPPacket, "tcp_urg?", tcpp_urg, 0);
     rb_define_method(cTCPPacket, "tcp_data", tcpp_data, 0);
+    rb_define_method(cTCPPacket, "tcp_data_len", tcpp_data_len, 0);
+    rb_define_method(cTCPPacket, "tcp_options", tcpp_options, 0);
+    rb_define_method(cTCPPacket, "tcp_csum_ok?", tcpp_csumok, 0);
+    rb_define_method(cTCPPacket, "tcp_truncated?", tcpp_truncated, 0);
 }
