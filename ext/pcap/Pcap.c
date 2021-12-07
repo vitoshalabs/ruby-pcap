@@ -617,6 +617,30 @@ capture_inject(self, v_buf)
     return Qnil;
 }
 
+// configure capture direction: IN/OUT packets
+static VALUE
+capture_direction(self, direction)
+     VALUE direction;
+     VALUE self;
+{
+    struct capture_object *cap;
+    // default value is in and out packets
+    int v_direction = PCAP_D_INOUT;
+
+    DEBUG_PRINT("capture_direction");
+    GetCapture(self, cap);
+    Check_Type(direction, T_SYMBOL);
+    // set desired direction: :in,:out or both
+    if (SYM2ID(direction) == rb_intern("in")) {
+      DEBUG_PRINT("setting capture direction IN");
+      v_direction = PCAP_D_IN;
+    } else if (SYM2ID(direction) == rb_intern("out")) {
+      DEBUG_PRINT("setting capture direction OUT");
+      v_direction = PCAP_D_OUT;
+    }
+  return INT2NUM(pcap_setdirection(cap->pcap, v_direction));
+}
+
 /*
  * Dumper object
  */
@@ -982,6 +1006,7 @@ Init_pcap(void)
     rb_define_method(cCapture, "snaplen", capture_snapshot, 0);
     rb_define_method(cCapture, "stats", capture_stats, 0);
     rb_define_method(cCapture, "inject", capture_inject, 1);
+    rb_define_method(cCapture, "direction", capture_direction, 1);
 
     /* define class Dumper */
     cDumper = rb_define_class_under(mPcap, "Dumper", rb_cObject);
