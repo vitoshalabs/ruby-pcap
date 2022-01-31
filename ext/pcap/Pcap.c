@@ -7,7 +7,6 @@
  */
 
 #include "ruby_pcap.h"
-#include "rubysig.h"
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -318,36 +317,112 @@ handler(cap, pkthdr, data)
     rb_yield(new_packet(data, pkthdr, cap->dl_type));
 }
 
+#define DST_ADDR(data)  INT2FIX(ntohl(*((unsigned int *) (data + 30))))
+#define SRC_ADDR(data)  INT2FIX(ntohl(*((unsigned int *) (data + 26))))
+
+static void
+dst_ipv4_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(DST_ADDR(data));
+}
+
+static void
+src_ipv4_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(SRC_ADDR(data));
+}
+
+#define SRCV6_ADDR(data)  rb_integer_unpack((u_char *) (data + 22), 16, 1, 0, INTEGER_PACK_BIG_ENDIAN)
+#define DSTV6_ADDR(data)  rb_integer_unpack((u_char *) (data + 38), 16, 1, 0, INTEGER_PACK_BIG_ENDIAN)
+
+static void
+dst_ipv6_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(DSTV6_ADDR(data));
+}
+
+static void
+src_ipv6_addr_handler(cap, pkthdr, data)
+     struct capture_object *cap;
+     const struct pcap_pkthdr *pkthdr;
+     const u_char *data;
+{
+  rb_yield(SRCV6_ADDR(data));
+}
+
+void parse_opts(VALUE v_opts, void **default_handler)
+{
+  if (NIL_P(v_opts)) {
+    DEBUG_PRINT("using default capture handler");
+    *default_handler = &handler;
+  } else {
+    // raise error if second argument is not a symbol
+    Check_Type(v_opts, T_SYMBOL);
+    // only :source, :destination are supported
+    if (SYM2ID(v_opts) == rb_intern("source")) {
+      DEBUG_PRINT("yeilding only source ipv4 addresses");
+      *default_handler = &src_ipv4_addr_handler;
+    } else if (SYM2ID(v_opts) == rb_intern("destination")) {
+      DEBUG_PRINT("yeilding only destination ipv4 addresses");
+      *default_handler = &dst_ipv4_addr_handler;
+    } else if (SYM2ID(v_opts) == rb_intern("destinationv6")) {
+        DEBUG_PRINT("yeilding only destination ipv6 addresses");
+        *default_handler = &dst_ipv6_addr_handler;
+    } else if (SYM2ID(v_opts) == rb_intern("sourcev6")) {
+        DEBUG_PRINT("yeilding only source ipv6 addresses");
+        *default_handler = &src_ipv6_addr_handler;
+    } else {
+      // unkonw keyword passed, use default capture handler
+      DEBUG_PRINT("unknown option, using default capture handler");
+      *default_handler = &handler;
+    }
+  }
+}
+
 static VALUE
 capture_dispatch(argc, argv, self)
      int argc;
      VALUE *argv;
      VALUE self;
 {
-    VALUE v_cnt;
-    int cnt;
+    VALUE v_cnt, v_opts;
+    int ret = 0, cnt = 0;
+    unsigned int cap_cnt = 0;
     struct capture_object *cap;
-    int ret;
+    void *default_handler;
 
     DEBUG_PRINT("capture_dispatch");
     GetCapture(self, cap);
 
     /* scan arg */
-    if (rb_scan_args(argc, argv, "01", &v_cnt) >= 1) {
-        FIXNUM_P(v_cnt);
-        cnt = FIX2INT(v_cnt);
+    rb_scan_args(argc, argv, "02", &v_cnt, &v_opts);
+    if (NIL_P(v_cnt)) {
+      cnt = -1;
     } else {
-        cnt = -1;
+      FIXNUM_P(v_cnt);
+      cnt = FIX2INT(v_cnt);
     }
-
-    MAYBE_TRAP_BEG;
-    ret = pcap_dispatch(cap->pcap, cnt, handler, (u_char *)cap);
-    MAYBE_TRAP_END;
-    if (ret == -1) {
+    parse_opts(v_opts, &default_handler);
+    // call dispatch with 10,000 and break if we have reached desired amount
+    // if dispatch is called with -1/0 sometimes it dispatches millions of packets
+    for (cap_cnt = 0; cap_cnt < cnt; cap_cnt += ret ) {
+      MAYBE_TRAP_BEG;
+      ret = pcap_dispatch(cap->pcap, 10000, default_handler, (u_char *)cap);
+      MAYBE_TRAP_END;
+      if (ret < 0) {
         rb_raise(ePcapError, "dispatch: %s", pcap_geterr(cap->pcap));
+      }
     }
-
-    return INT2FIX(ret);
+  return UINT2NUM(cap_cnt);
 }
 
 static VALUE
@@ -373,25 +448,27 @@ capture_loop(argc, argv, self)
      VALUE *argv;
      VALUE self;
 {
-    VALUE v_cnt;
+    VALUE v_cnt, v_opts;
     int cnt;
     struct capture_object *cap;
     int ret;
+    void *default_handler;
 
     DEBUG_PRINT("capture_loop");
     GetCapture(self, cap);
 
     /* scan arg */
-    if (rb_scan_args(argc, argv, "01", &v_cnt) >= 1) {
-        FIXNUM_P(v_cnt);
-        cnt = FIX2INT(v_cnt);
+    rb_scan_args(argc, argv, "02", &v_cnt, &v_opts);
+    if (NIL_P(v_cnt)) {
+      cnt = -1;
     } else {
-        cnt = -1;
+      FIXNUM_P(v_cnt);
+      cnt = FIX2INT(v_cnt);
     }
-
+    parse_opts(v_opts, &default_handler);
     if (pcap_file(cap->pcap) != NULL) {
         MAYBE_TRAP_BEG;
-        ret = pcap_loop(cap->pcap, cnt, handler, (u_char *)cap);
+        ret = pcap_loop(cap->pcap, cnt, default_handler, (u_char *)cap);
         MAYBE_TRAP_END;
     }
     else {
@@ -409,7 +486,7 @@ capture_loop(argc, argv, self)
                     rb_thread_wait_fd(fd);
                 }
                 MAYBE_TRAP_BEG;
-                ret = pcap_dispatch(cap->pcap, 1, handler, (u_char *)cap);
+                ret = pcap_dispatch(cap->pcap, 1, default_handler, (u_char *)cap);
                 MAYBE_TRAP_END;
             } while (ret == 0);
 
@@ -538,6 +615,30 @@ capture_inject(self, v_buf)
         rb_raise(ePcapError, "pcap_inject expected to write %d but actually wrote %d", bufsiz, r);
     }
     return Qnil;
+}
+
+// configure capture direction: IN/OUT packets
+static VALUE
+capture_direction(self, direction)
+     VALUE direction;
+     VALUE self;
+{
+    struct capture_object *cap;
+    // default value is in and out packets
+    int v_direction = PCAP_D_INOUT;
+
+    DEBUG_PRINT("capture_direction");
+    GetCapture(self, cap);
+    Check_Type(direction, T_SYMBOL);
+    // set desired direction: :in,:out or both
+    if (SYM2ID(direction) == rb_intern("in")) {
+      DEBUG_PRINT("setting capture direction IN");
+      v_direction = PCAP_D_IN;
+    } else if (SYM2ID(direction) == rb_intern("out")) {
+      DEBUG_PRINT("setting capture direction OUT");
+      v_direction = PCAP_D_OUT;
+    }
+  return INT2NUM(pcap_setdirection(cap->pcap, v_direction));
 }
 
 /*
@@ -905,6 +1006,7 @@ Init_pcap(void)
     rb_define_method(cCapture, "snaplen", capture_snapshot, 0);
     rb_define_method(cCapture, "stats", capture_stats, 0);
     rb_define_method(cCapture, "inject", capture_inject, 1);
+    rb_define_method(cCapture, "direction", capture_direction, 1);
 
     /* define class Dumper */
     cDumper = rb_define_class_under(mPcap, "Dumper", rb_cObject);

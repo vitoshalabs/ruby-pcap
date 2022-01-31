@@ -15,6 +15,8 @@
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
 #include <netinet/ip.h>
+#include <netinet/ip6.h>
+#include <netinet/icmp6.h>
 #include <arpa/inet.h>
 #ifndef IP_OFFMASK
 # define IP_OFFMASK 0x1fff
@@ -29,10 +31,7 @@
 #include <netdb.h>
 
 #ifdef DEBUG
-# define DEBUG_PRINT(x) do {\
-    ((RTEST(ruby_debug) && RTEST(ruby_verbose))?\
-    (fprintf(stderr, "%s\n", x),fflush(stderr)) : 0)\
-} while (0)
+# define DEBUG_PRINT(x) fprintf(stderr, "%s\n", x),fflush(stderr)
 #else
 # define DEBUG_PRINT(x) do {} while (0)
 #endif
@@ -89,11 +88,16 @@ struct packet_object {
         rb_raise(eTruncatedPacket, (emsg)) : 0 \
 )
 
+#define IsTruncated(pkt, from, need) (\
+    (from) + (need) > (pkt)->hdr.pkthdr.caplen ? \
+        1 : 0 \
+)
 #define IsKindOf(v, class) RTEST(rb_obj_is_kind_of(v, class))
 #define CheckClass(v, class) ((IsKindOf(v, class)) ? 0 :\
     rb_raise(rb_eTypeError, "wrong type %s (expected %s)",\
         rb_class2name(CLASS_OF(v)), rb_class2name(class)))
 
+#define DEBUG_CHECKSUM 0
 
 /* Pcap.c */
 extern VALUE mPcap, rbpcap_convert;
@@ -118,17 +122,43 @@ VALUE new_ipaddr(struct in_addr *);
 
 /* tcp_packet.c */
 extern VALUE cTCPPacket;
+extern VALUE cTCPv6Packet;
 void Init_tcp_packet(void);
 VALUE setup_tcp_packet(struct packet_object *, int);
+VALUE setup_tcpv6_packet(struct packet_object *, int);
+
+/* ipv6_packet.c */
+#define IPV6_HDR(pkt)     ((struct ip6_hdr *)LAYER3_HDR(pkt))
+#define IPV6_HDR_OBJ(self) ((struct ip6_hdr *)LAYER3_HDR((struct packet_object *)DATA_PTR(self)))
+extern VALUE cIPv6Packet;
+void Init_ipv6_packet(void);
+VALUE setup_ipv6_packet(struct packet_object *, int);
 
 /* udp_packet.c */
 extern VALUE cUDPPacket;
+extern VALUE cUDPv6Packet;
 void Init_udp_packet(void);
 VALUE setup_udp_packet(struct packet_object *, int);
+VALUE setup_udpv6_packet(struct packet_object *, int);
 
 /* icmp_packet.c */
 extern VALUE cICMPPacket;
+extern VALUE cICMPv6Packet;
 void Init_icmp_packet(void);
+void Init_icmpv6_packet(void);
 VALUE setup_icmp_packet(struct packet_object *, int);
+VALUE setup_icmpv6_packet(struct packet_object *);
 
+
+/* arp_packet.c */
+extern VALUE cARPPacket;
+void Init_arp_packet(void);
+VALUE setup_arp_packet(struct packet_object *, int);
+
+/* slow_protocol_packet.c */
+extern VALUE cSPPacket;
+extern VALUE cLACPPacket;
+void Init_sp_packet(void);
+VALUE setup_slow_protocol_packet(struct packet_object *, int);
 #endif /* RUBY_PCAP_H */
+

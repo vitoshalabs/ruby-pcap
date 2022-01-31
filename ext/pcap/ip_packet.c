@@ -14,8 +14,7 @@ static VALUE cIPAddress;
 
 static unsigned short in_cksum(unsigned char *data, int len);
 
-#define CheckTruncateIp(pkt, need) \
-    CheckTruncate(pkt, pkt->hdr.layer3_off, need, "truncated IP")
+#define CheckTruncateIp(pkt, need)  CheckTruncate(pkt, pkt->hdr.layer3_off, need, "truncated IP")
 
 VALUE
 setup_ip_packet(pkt, nl_len)
@@ -49,7 +48,7 @@ setup_ip_packet(pkt, nl_len)
                 case IPPROTO_ICMP:
                     class = setup_icmp_packet(pkt, tl_len);
                     break;
-                }               
+                }
             }
         }
     }
@@ -145,6 +144,19 @@ ipp_sumok(self)
         sum = (sum & 0xffff) + (sum >> 16);
     }
     if (sum == 0xffff)
+        return Qtrue;
+    return Qfalse;
+}
+
+static VALUE
+ipp_truncated(self)
+     VALUE self;
+{
+    struct packet_object *pkt;
+    struct ip *ip;
+    GetPacket(self, pkt);
+    ip = IP_HDR(pkt);
+    if IsTruncated(pkt, pkt->hdr.layer3_off, ntohs(ip->ip_len))
         return Qtrue;
     return Qfalse;
 }
@@ -401,6 +413,7 @@ Init_ip_packet(void)
     rb_define_method(cIPPacket, "dst=", ipp_set_dst, 1);
     rb_define_method(cIPPacket, "ip_data", ipp_data, 0);
     rb_define_method(cIPPacket, "ip_sum_update!", ipp_sum_update, 0);
+    rb_define_method(cIPPacket, "ip_truncated?", ipp_truncated, 0);
 
     cIPAddress = rb_define_class_under(mPcap, "IPAddress", rb_cObject);
     rb_define_singleton_method(cIPAddress, "new", ipaddr_s_new, 1);
@@ -417,8 +430,4 @@ Init_ip_packet(void)
 
     rb_define_method(cIPAddress, "_dump", ipaddr_dump, 1);
     rb_define_singleton_method(cIPAddress, "_load", ipaddr_s_load, 1);
-
-    Init_tcp_packet();
-    Init_udp_packet();
-    Init_icmp_packet();
 }

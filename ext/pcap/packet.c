@@ -11,7 +11,17 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <netinet/if_ether.h>
+#ifndef ETH_P_IPV6
+#define ETH_P_IPV6 0x86DD /* IPv6 packet */
+#endif
 
+#ifndef ETH_P_SLOW
+#define ETH_P_SLOW 0x8809 /* Slow Protocol frame */
+#endif
+
+#ifndef ETH_P_ARP
+#define ETH_P_ARP	0x0806		/* Address Resolution packet	*/
+#endif
 #define DL_HDR(pkt)     ((u_char *)LAYER2_HDR(pkt))
 #define DL_DATA(pkt)    ((u_char *)LAYER3_HDR(pkt))
 
@@ -125,14 +135,18 @@ new_packet(data, pkthdr, dl_type)
         case ETHERTYPE_IP:
             class = setup_ip_packet(pkt, nl_len);
             break;
+        case ETH_P_IPV6:
+            class = setup_ipv6_packet(pkt, nl_len);
+            break;
+        case ETH_P_ARP:
+            class = setup_arp_packet(pkt, nl_len);
+            break;
+        case ETH_P_SLOW:
+            class = setup_slow_protocol_packet(pkt, nl_len);
+            break;
         }
     }
-#if DEBUG
-    if (ruby_debug && TYPE(class) != T_CLASS) {
-        rb_fatal("not class");
-    }
-#endif
-    return Data_Wrap_Struct(class, mark_packet, free_packet, pkt);
+  return Data_Wrap_Struct(class, mark_packet, free_packet, pkt);
 }
 
 static VALUE
@@ -282,14 +296,18 @@ static VALUE\
 PACKET_METHOD(packet_get_udata, pkt->udata);
 PACKET_METHOD(packet_datalink, INT2FIX(pkt->hdr.dl_type));
 PACKET_METHOD(packet_ip, rb_obj_is_kind_of(self, cIPPacket));
-PACKET_METHOD(packet_tcp, rb_obj_is_kind_of(self, cTCPPacket));
-PACKET_METHOD(packet_udp, rb_obj_is_kind_of(self, cUDPPacket));
+PACKET_METHOD(packet_ipv6, rb_obj_is_kind_of(self, cIPv6Packet));
+PACKET_METHOD(packet_tcp, rb_obj_is_kind_of(self, cTCPPacket) | rb_obj_is_kind_of(self, cTCPv6Packet));
+PACKET_METHOD(packet_udp, rb_obj_is_kind_of(self, cUDPPacket) | rb_obj_is_kind_of(self, cUDPv6Packet));
 PACKET_METHOD(packet_length, UINT32_2_NUM(pkt->hdr.pkthdr.len));
 PACKET_METHOD(packet_caplen, UINT32_2_NUM(pkt->hdr.pkthdr.caplen));
 PACKET_METHOD(packet_time, rb_time_new(pkt->hdr.pkthdr.ts.tv_sec,
                                        pkt->hdr.pkthdr.ts.tv_usec));
 PACKET_METHOD(packet_time_i, rb_int2inum(pkt->hdr.pkthdr.ts.tv_sec));
 PACKET_METHOD(packet_raw_data, rb_str_new(pkt->data, pkt->hdr.pkthdr.caplen));
+PACKET_METHOD(packet_arp, rb_obj_is_kind_of(self, cARPPacket));
+PACKET_METHOD(packet_lacp, rb_obj_is_kind_of(self, cLACPPacket));
+
 
 void
 Init_packet(void)
@@ -308,9 +326,12 @@ Init_packet(void)
     rb_define_method(cPacket, "udata", packet_get_udata, 0);
     rb_define_method(cPacket, "udata=", packet_set_udata, 1);
     rb_define_method(cPacket, "datalink", packet_datalink, 0);
+    rb_define_method(cPacket, "arp?", packet_arp, 0);
     rb_define_method(cPacket, "ip?", packet_ip, 0);
+    rb_define_method(cPacket, "ipv6?", packet_ipv6, 0);
     rb_define_method(cPacket, "tcp?", packet_tcp, 0);
     rb_define_method(cPacket, "udp?", packet_udp, 0);
+    rb_define_method(cPacket, "lacp?", packet_lacp, 0);
     rb_define_method(cPacket, "length", packet_length, 0);
     rb_define_method(cPacket, "size", packet_length, 0);
     rb_define_method(cPacket, "caplen", packet_caplen, 0);
@@ -325,4 +346,11 @@ Init_packet(void)
     id_load = rb_intern("load");
     id_dump = rb_intern("dump");
     Init_ip_packet();
+    Init_arp_packet();
+    Init_ipv6_packet();
+    Init_tcp_packet();
+    Init_udp_packet();
+    Init_icmp_packet();
+    Init_icmpv6_packet();
+    Init_sp_packet();
 }

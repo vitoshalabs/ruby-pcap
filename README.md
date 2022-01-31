@@ -1,6 +1,3 @@
-# no longer maintained
-
-I'm no longer actively maintaining this project, get in touch if you're interested in taking it over.
 
 ## ruby-pcap
 
