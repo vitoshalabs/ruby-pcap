@@ -14,8 +14,7 @@ gem install ruby-pcap
 
 ### Requirements
 
-* ruby-1.9.3 or higher
-  * May work with older ruby version but not being tested
+* ruby-2.1 or higher
 * libpcap (http://www.tcpdump.org/)
 
 ## Usage
