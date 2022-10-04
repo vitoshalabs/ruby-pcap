@@ -19,8 +19,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
       - name: Install system libs dependencies
-        run: sudo apt-get update -qq
-        run: sudo apt-get install -y libpcap-dev
+        run: sudo apt-get update -qq && sudo apt-get install -y libpcap-dev
       - name: Get deps
         run: bundle install
       - name: Build it
