@@ -308,6 +308,19 @@ capture_close(self)
     return Qnil;
 }
 
+static VALUE
+is_capture_closed(self)
+     VALUE self;
+{
+    struct capture_object *cap;
+    DEBUG_PRINT("is_capture_closed");
+    Data_Get_Struct(self, struct capture_object, cap);
+    if (cap->pcap == NULL) {
+      return Qtrue;
+    }
+    return Qfalse;
+}
+
 static void
 handler(cap, pkthdr, data)
      struct capture_object *cap;
@@ -440,6 +453,18 @@ capture_fh(argc, argv, self)
     GetCapture(self, cap);
 
     return rb_funcall(rb_path2class("IO"), rb_intern("new"), 1, INT2FIX(pcap_fileno(cap->pcap)));
+}
+
+static VALUE
+capture_breakloop(self)
+     VALUE self;
+{
+    struct capture_object *cap;
+
+    DEBUG_PRINT("capture_breakloop");
+    GetCapture(self, cap);
+    pcap_breakloop(cap->pcap);
+    return Qnil;
 }
 
 static VALUE
@@ -1007,6 +1032,8 @@ Init_pcap(void)
     rb_define_method(cCapture, "stats", capture_stats, 0);
     rb_define_method(cCapture, "inject", capture_inject, 1);
     rb_define_method(cCapture, "direction", capture_direction, 1);
+    rb_define_method(cCapture, "breakloop", capture_breakloop, 0);
+    rb_define_method(cCapture, "closed?", is_capture_closed, 0);
 
     /* define class Dumper */
     cDumper = rb_define_class_under(mPcap, "Dumper", rb_cObject);
