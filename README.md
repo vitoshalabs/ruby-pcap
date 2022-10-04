@@ -1,7 +1,7 @@
 
 ## ruby-pcap
 
-[![RSpec test run](https://github.com/vitoshalabs/ruby-pcap/actions/workflows/build.yml/badge.svg)](https://github.com/vitoshalabs/ruby-pcap/actions/workflows/build.yml)
+[![build workflow](https://github.com/vitoshalabs/ruby-pcap/actions/workflows/build.yml/badge.svg)](https://github.com/vitoshalabs/ruby-pcap/actions/workflows/build.yml)
 
 ruby-pcap is a ruby extension to LBL libpcap (Packet Capture library).
 This library also includes classes to access TCP/IP header.
