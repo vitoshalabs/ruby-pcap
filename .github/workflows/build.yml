@@ -10,7 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      ruby-version: ['3.1', '3.0', '2.7','2.4','2.0','1.9']
+      matrix:
+        ruby-version: ['3.1', '3.0', '2.7','2.4','2.0','1.9']
     steps:
       - uses: actions/checkout@v2
       - name: Set up ruby ${{ matrix.ruby_version}}
