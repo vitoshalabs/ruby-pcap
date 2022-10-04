@@ -4,8 +4,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = "ruby-pcap"
-  gem.version       = "0.8.0"
-  gem.authors       = [%q{Masaki Fukushima}, %q{Andrew Hobson}, %q{Marcus Barczak}]
+  gem.version       = "0.8.1"
+  gem.authors       = [%q{Masaki Fukushima}, %q{Andrew Hobson}, %q{Marcus Barczak}, %q{Vitosha Labs Open Source team}]
   gem.email         = ["opensource@vitosha-labs.bg"]
   gem.description   = %q{Ruby interface to LBL Packet Capture library. This library also includes classes to access packet header fields.}
   gem.summary       = %q{Ruby interface to LBL Packet Capture library.}
