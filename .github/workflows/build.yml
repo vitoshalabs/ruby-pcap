@@ -1,0 +1,26 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      ruby-version: ['3.1', '3.0', '2.7','2.4','2.0','1.9']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up ruby ${{ matrix.ruby_version}}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+      - name: Install system libs dependencies
+        run: sudo apt-get update -qq
+        run: sudo apt-get install -y libpcap-dev
+      - name: Get deps
+        run: bundle install
+      - name: Build it
+        run: bundle exec rake
